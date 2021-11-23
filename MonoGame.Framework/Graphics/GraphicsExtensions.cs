@@ -322,7 +322,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			switch (function) {
 			case BlendFunction.Add:
 				return BlendEquationMode.FuncAdd;
-#if WINDOWS || DESKTOPGL || IOS
+#if WINDOWS || DESKTOPGL || IOS || ANDROID
 			case BlendFunction.Max:
 				return BlendEquationMode.Max;
 			case BlendFunction.Min:

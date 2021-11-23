@@ -638,6 +638,8 @@ namespace Microsoft.Xna.Framework
                 newClientBounds.Height = GraphicsDevice.DisplayMode.Height;
             }
 
+            newClientBounds = new Rectangle(0, 0, PreferredBackBufferWidth, PreferredBackBufferHeight);
+
             // Ensure buffer size is reported correctly
             _graphicsDevice.PresentationParameters.BackBufferWidth = newClientBounds.Width;
             _graphicsDevice.PresentationParameters.BackBufferHeight = newClientBounds.Height;

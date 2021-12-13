@@ -398,7 +398,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             // points are released.
             if (heldLocations > 1)
             {
-                _tapDisabled = true;
+                //_tapDisabled = true;
                 _holdDisabled = true;
             }
 
@@ -478,8 +478,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
                             // If there are still other pressed locations then there
                             // is nothing more we can do with this release.
-                            if (heldLocations != 0)
-                                break;
+                            //if (heldLocations != 0)
+                            //    break;
 
                             // From testing XNA it seems we need a velocity 
                             // of about 100 to classify this as a flick.

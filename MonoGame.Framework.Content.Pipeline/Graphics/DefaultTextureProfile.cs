@@ -33,6 +33,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 case TextureProcessorOutputFormat.DxtCompressed:
                 case TextureProcessorOutputFormat.Etc1Compressed:
                 case TextureProcessorOutputFormat.PvrCompressed:
+                case TextureProcessorOutputFormat.AstcCompressed:
                     return true;
             }
             return false;
@@ -44,9 +45,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             if (format == TextureProcessorOutputFormat.Compressed)
             {
                 if (platform == TargetPlatform.iOS)
-                    format = TextureProcessorOutputFormat.PvrCompressed;
+                    format = TextureProcessorOutputFormat.AstcCompressed;
                 else if (platform == TargetPlatform.Android)
-                    format = TextureProcessorOutputFormat.Etc1Compressed;
+                    format = TextureProcessorOutputFormat.AstcCompressed;
                 else
                     format = TextureProcessorOutputFormat.DxtCompressed;
             }
@@ -56,8 +57,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 // Make sure the target platform supports the selected texture compression format
                 if (platform == TargetPlatform.iOS)
                 {
-                    if (format != TextureProcessorOutputFormat.PvrCompressed)
-                        throw new PlatformNotSupportedException("iOS platform only supports PVR texture compression");
+                    if (format != TextureProcessorOutputFormat.PvrCompressed && format != TextureProcessorOutputFormat.AstcCompressed)
+                        throw new PlatformNotSupportedException("iOS platform only supports PVR or ASTC texture compression");
                 }
                 else if (platform == TargetPlatform.Windows ||
                             platform == TargetPlatform.WindowsPhone8 ||
@@ -137,6 +138,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
                 case TextureProcessorOutputFormat.PvrCompressed:
                     GraphicsUtil.CompressPvrtc(context, content, isSpriteFont);
+                    break;
+                case TextureProcessorOutputFormat.AstcCompressed:
+                    //Not supported 
                     break;
             }
         }

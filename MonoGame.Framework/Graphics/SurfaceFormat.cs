@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+ // MonoGame - Copyright (C) The MonoGame Team
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -183,6 +183,31 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Etc2 SRGB8A8 EAC (Android/iOS withh OpenglES 3.0)
 		/// </summary>
         SRgb8A8Etc2 = 95,
+
+        /// <summary>
+        /// Astc RGBA 4x4 (Android/iOS with OpenglES 3.0)
+        /// </summary>
+        Rgba4x4Astc = 96,
+        /// <summary>
+        /// Astc RGBA 5x5 (Android/iOS with OpenglES 3.0)
+        /// </summary>
+        Rgba5x5Astc = 97,
+        /// <summary>
+        /// Astc RGBA 6x6 (Android/iOS with OpenglES 3.0)
+        /// </summary>
+        Rgba6x6Astc = 98,
+        /// <summary>
+        /// Astc SRGB8_ALPHA8 4x4 (Android/iOS with OpenglES 3.0)
+        /// </summary>
+        SRgba4x4Astc = 99,
+        /// <summary>
+        /// Astc SRGB8_ALPHA8 5x5 (Android/iOS with OpenglES 3.0)
+        /// </summary>
+        SRgba5x5Astc = 100,
+        /// <summary>
+        /// Astc SRGB8_ALPHA8 6x6 (Android/iOS with OpenglES 3.0)
+        /// </summary>
+        SRgba6x6Astc = 101,
 
         #endregion
     }

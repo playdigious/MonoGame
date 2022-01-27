@@ -426,6 +426,14 @@ namespace MonoGame.OpenGL
         Etc2Srgb8A1 = 0x9277,
         Etc2Rgba8Eac = 0x9278,
         Etc2SRgb8A8Eac = 0x9279,
+
+        // ASTC
+        AstcRgba4x4 = 0x93B0,
+        AstcRgba5x5 = 0x93B2,
+        AstcRgba6x6 = 0x93B4,
+        AstcSrgb8a84x4 = 0x93D0,
+        AstcSrgb8a85x5 = 0x93D2,
+        AstcSrgb8a86x6 = 0x93D4,
     }
 
     internal enum PixelFormat

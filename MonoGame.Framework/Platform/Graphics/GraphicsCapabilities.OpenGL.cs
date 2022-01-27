@@ -69,6 +69,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (GL.BoundApi == GL.RenderApi.ES)
             {
                 SupportsEtc2 = device.glMajorVersion >= 3;
+                SupportsAstc = device.glMajorVersion >= 3;
             }
 
 

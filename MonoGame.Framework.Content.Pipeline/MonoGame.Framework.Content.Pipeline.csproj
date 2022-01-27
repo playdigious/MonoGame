@@ -74,9 +74,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.WindowsDX.csproj">
-      <PrivateAssets>All</PrivateAssets>
-    </ProjectReference>
+    <ProjectReference Include="..\..\libktxsharp-master\lib\KtxSharp.csproj" />
+    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.WindowsDX.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -246,9 +245,7 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <Content Include="..\Artifacts\MonoGame.Effect.Compiler\$(Configuration)\*"
-             Exclude="..\Artifacts\MonoGame.Effect.Compiler\$(Configuration)\*.nupkg"
-             Visible="false">
+    <Content Include="..\Artifacts\MonoGame.Effect.Compiler\$(Configuration)\*" Exclude="..\Artifacts\MonoGame.Effect.Compiler\$(Configuration)\*.nupkg" Visible="false">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

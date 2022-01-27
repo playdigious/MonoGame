@@ -51,5 +51,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// The input texture is compressed using ATI texture compression.  Used on some Android platforms.
         /// </summary>
         AtcCompressed,
+
+        /// <summary>
+        ///  The input texture is compressed using ASTC texture compression. Used on iOS and recent Android platforms.
+        /// </summary>
+        AstcCompressed,
     }
 }

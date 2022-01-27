@@ -70,6 +70,12 @@ namespace Microsoft.Xna.Framework.Graphics
                             case SurfaceFormat.Srgb8A1Etc2:
                             case SurfaceFormat.Rgba8Etc2:
                             case SurfaceFormat.SRgb8A8Etc2:
+                            case SurfaceFormat.Rgba4x4Astc:
+                            case SurfaceFormat.Rgba5x5Astc:
+                            case SurfaceFormat.Rgba6x6Astc:
+                            case SurfaceFormat.SRgba4x4Astc:
+                            case SurfaceFormat.SRgba5x5Astc:
+                            case SurfaceFormat.SRgba6x6Astc:
                             case SurfaceFormat.RgbaAtcExplicitAlpha:
                             case SurfaceFormat.RgbaAtcInterpolatedAlpha:
                                 imageSize = (size + 3) / 4 * ((size + 3) / 4) * format.GetSize();

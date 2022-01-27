@@ -49,6 +49,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                         ".webp", // WebP
                         ".xbm", // X BitMap
                         ".xpm", // X PixMap
+                        ".ktx", // KTX
                     DisplayName = "Texture Importer - MonoGame", DefaultProcessor = "TextureProcessor")]
     public class TextureImporter : ContentImporter<TextureContent>
     {
@@ -76,6 +77,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     return DdsLoader.Import(filename, context);
                 case ".bmp":
                     return LoadImage(filename);
+                case ".ktx":
+                    return LoadKtxImage(filename);
             }
 
             var output = new Texture2DContent { Identity = new ContentIdentity(filename) };
@@ -205,6 +208,53 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
             var face = new PixelBitmapContent<Color>(result.Width, result.Height);
             face.SetPixelData(result.Data);
+            output.Faces[0].Add(face);
+
+            return output;
+        }
+
+        TextureContent LoadKtxImage(string filename)
+        {
+            var output = new Texture2DContent { Identity= new ContentIdentity(filename) };
+
+            byte[] ktxBytes = File.ReadAllBytes(filename);
+            KtxSharp.KtxStructure ktxStructure;
+            using (MemoryStream ms = new MemoryStream(ktxBytes))
+            {
+                ktxStructure = KtxSharp.KtxLoader.LoadInput(ms);
+            }
+
+            KtxSharp.KtxTextureData data = ktxStructure.textureData;
+            var width = (int)ktxStructure.header.pixelWidth;
+            var height = (int)ktxStructure.header.pixelHeight;
+
+            KtxSharp.GlInternalFormat internalFormat = ktxStructure.header.glInternalFormat;
+            AstcBitmapContent face = null;
+            switch (internalFormat)
+            {
+                case KtxSharp.GlInternalFormat.GL_COMPRESSED_RGBA_ASTC_4x4_KHR:
+                    face = new AstcRgba4x4BitmapContent(width, height);
+                    break;
+                case KtxSharp.GlInternalFormat.GL_COMPRESSED_RGBA_ASTC_5x5_KHR:
+                    face = new AstcRgba5x5BitmapContent(width, height);
+                    break;
+                case KtxSharp.GlInternalFormat.GL_COMPRESSED_RGBA_ASTC_6x6_KHR:
+                    face = new AstcRgba6x6BitmapContent(width, height);
+                    break;
+                case KtxSharp.GlInternalFormat.GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR:
+                    face = new AstcSRgba4x4BitmapContent(width, height);
+                    break;
+                case KtxSharp.GlInternalFormat.GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR:
+                    face = new AstcSRgba5x5BitmapContent(width, height);
+                    break;
+                case KtxSharp.GlInternalFormat.GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR:
+                    face = new AstcSRgba6x6BitmapContent(width, height);
+                    break;
+                default:
+                    throw new Exception("Format " + internalFormat + " not supported yet");
+            }
+            
+            face.SetPixelData(data.textureDataOfMipmapLevel[0]);
             output.Faces[0].Add(face);
 
             return output;

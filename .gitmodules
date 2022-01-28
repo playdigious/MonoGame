@@ -13,3 +13,6 @@
 [submodule "ThirdParty/NVorbis"]
 	path = ThirdParty/NVorbis
 	url = https://github.com/NVorbis/NVorbis.git
+[submodule "ThirdParty/libktxsharp"]
+	path = ThirdParty/libktxsharp
+	url = git@github.com:playdigious/libktxsharp.git

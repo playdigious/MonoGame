@@ -65,11 +65,11 @@ namespace Microsoft.Xna.Framework.Graphics
             SupportsEtc1 = GL.Extensions.Contains("GL_OES_compressed_ETC1_RGB8_texture");
             SupportsAtitc = GL.Extensions.Contains("GL_ATI_texture_compression_atitc") ||
                             GL.Extensions.Contains("GL_AMD_compressed_ATC_texture");
+            SupportsAstc = GL.Extensions.Contains("GL_KHR_texture_compression_astc_ldr");
 
             if (GL.BoundApi == GL.RenderApi.ES)
             {
                 SupportsEtc2 = device.glMajorVersion >= 3;
-                SupportsAstc = device.glMajorVersion >= 3;
             }
 
 

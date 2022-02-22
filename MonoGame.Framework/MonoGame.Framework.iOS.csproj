@@ -58,6 +58,7 @@
     <Compile Include="Platform\Media\MediaLibrary.iOS.cs" />
     <Compile Include="Platform\Media\MediaPlayer.Default.cs" />
     <Compile Include="Platform\Media\Song.iOS.cs" />
+    <Compile Include="Platform\Media\SuperVideoPlayer.iOS.cs" />
     <Compile Include="Platform\Media\Video.iOS.cs" />
     <Compile Include="Platform\Media\VideoPlayer.iOS.cs" />
     <Compile Include="Platform\TitleContainer.MacOS.cs" />

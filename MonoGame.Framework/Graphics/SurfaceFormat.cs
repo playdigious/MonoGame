@@ -89,6 +89,10 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Float pixel format for high dynamic range data.
         /// </summary>
         HdrBlendable,
+        /// <summary>
+        /// Unsigned 16-bit RG pixel format for store 8 bits per channel. 
+        /// </summary>
+        Rg16 = 23,
 
         #region Extensions
 

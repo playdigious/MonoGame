@@ -395,6 +395,7 @@ namespace MonoGame.OpenGL
         CompressedSrgbAlphaS3tcDxt3Ext = 0x8C4E,
         CompressedRgbaS3tcDxt5Ext = 0x83F3,
         CompressedSrgbAlphaS3tcDxt5Ext = 0x8C4F,
+        Rg8 = 0x822B,
         R32f = 0x822E,
         Rg16f = 0x822F,
         Rgba16f = 0x881A,

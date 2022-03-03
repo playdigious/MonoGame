@@ -554,6 +554,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				glFormat = PixelFormat.Luminance;
 				glType = PixelType.UnsignedByte;
 				break;
+            case SurfaceFormat.Rg16:
+                glInternalFormat = PixelInternalFormat.Rg8;
+                glFormat = PixelFormat.Rg;
+                glType = PixelType.UnsignedByte;
+                break;
 			case SurfaceFormat.Dxt1:
                 if (!supportsS3tc)
                     goto case InvalidFormat;
@@ -893,6 +898,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 case SurfaceFormat.Bgra5551:
                 case SurfaceFormat.HalfSingle:
                 case SurfaceFormat.NormalizedByte2:
+                case SurfaceFormat.Rg16:
                     return 2;
                 case SurfaceFormat.Color:
                 case SurfaceFormat.ColorSRgb:

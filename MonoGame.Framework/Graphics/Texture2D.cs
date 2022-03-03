@@ -461,7 +461,16 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
 
                     break;
+                case SurfaceFormat.Rg16:
+                    var rg16Data = new Rg16[colorDataLength];
+                    GetData(rg16Data);
 
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        colorData[i] = new Color(rg16Data[i].ToVector4());
+                    }
+
+                    break;
                 case SurfaceFormat.Bgr565:
                     var bgr565Data = new Bgr565[colorDataLength];
                     GetData(bgr565Data);

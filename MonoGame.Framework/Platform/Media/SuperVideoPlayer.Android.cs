@@ -10,7 +10,7 @@ namespace Microsoft.Xna.Framework.Media
     {
         private MediaExtractor mediaExtractor;
 
-        private bool abort = false;
+        private volatile bool abort = false;
         private int lumaBytes;
         private int chromaBytes;
         private TimeSpan videoDuration = TimeSpan.Zero;
@@ -81,8 +81,6 @@ namespace Microsoft.Xna.Framework.Media
             lumaTex.SetData(yuvBuffer, 0, lumaBytes);
             chromaTex.SetData(yuvBuffer, lumaBytes, chromaBytes);
 
-            playbackStopwatch.Start();
-
             // Init decoder
             decoder = MediaCodec.CreateDecoderByType(format.GetString(MediaFormat.KeyMime));
             // Pass in null surface to configure the codec for ByteBuffer output
@@ -98,24 +96,31 @@ namespace Microsoft.Xna.Framework.Media
         private void VideoLoop()
         {
             bool inputDone = false;
+            TimeSpan skipFramesUntil = TimeSpan.Zero;
 
-            while (true)
+            while (!abort)
             {
-                lock (decoderLock)
-                {
-                    if (abort)
-                    {
-                        break;
-                    }
-                }
-
                 if (!inputDone)
                 {
+                    // Skip frames
+                    if (playbackStopwatch.IsRunning)
+                    {
+                        while (playbackStopwatch.Elapsed.TotalSeconds > (mediaExtractor.SampleTime * 1e-6))
+                        {
+                            skipFramesUntil = TimeSpan.FromSeconds(mediaExtractor.SampleTime * 1e-6);
+                            if (!mediaExtractor.Advance())
+                            {
+                                break;
+                            }
+                        }
+                    }
+
                     int index = decoder.DequeueInputBuffer(DECODER_TIMEOUT_US);  // if negative, all input buffers are busy
 
                     if (index >= 0)
                     {
                         var inputBuffer = decoder.GetInputBuffer(index);
+
                         int sampleSize = mediaExtractor.ReadSampleData(inputBuffer, 0);
                         if (sampleSize >= 0)
                         {
@@ -144,6 +149,13 @@ namespace Microsoft.Xna.Framework.Media
 
                         var presentationTime = TimeSpan.FromSeconds(info.PresentationTimeUs * 1e-6);
 
+                        // If we're skipping frames, don't update the texture
+                        if (presentationTime < skipFramesUntil)
+                        {
+                            decoder.ReleaseOutputBuffer(index, false);
+                            continue;
+                        }
+
                         if (presentationTime < this.bufferedFrameTime)
                         {
                             Debug.WriteLine("Video: went back in time? " + presentationTime + " < " + this.bufferedFrameTime);
@@ -160,15 +172,12 @@ namespace Microsoft.Xna.Framework.Media
                         }
                         else
                         {
+                            // Sleep until presentation time before committing the buffer
                             var delta = presentationTime - playbackStopwatch.Elapsed;
                             if (delta.Milliseconds > 0)
                             {
                                 //Debug.WriteLine("Video: sleep " + delta.Milliseconds + " ms before presenting");
                                 Thread.Sleep(delta.Milliseconds);
-                            }
-                            else
-                            {
-                                Debug.WriteLine("Video: lag! " + delta.Milliseconds);
                             }
                         }
 
@@ -252,10 +261,7 @@ namespace Microsoft.Xna.Framework.Media
                 return;
             }
 
-            lock (decoderLock)
-            {
-                abort = true;
-            }
+            abort = true;
 
             if (decoderThread != null && decoderThread.IsAlive)
             {

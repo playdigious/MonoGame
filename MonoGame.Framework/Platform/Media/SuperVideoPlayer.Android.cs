@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 
 namespace Microsoft.Xna.Framework.Media
@@ -54,6 +55,23 @@ namespace Microsoft.Xna.Framework.Media
             throw new InvalidOperationException("No video track in media");
         }
 
+        private static string GetBestDecoder(string mime, int colorFormat)
+        {
+            for (int i = 0; i < MediaCodecList.CodecCount; i++)
+            {
+                MediaCodecInfo codecInfo = MediaCodecList.GetCodecInfoAt(i);
+
+                if (!codecInfo.IsEncoder
+                    && codecInfo.GetSupportedTypes().Contains(mime)
+                    && codecInfo.GetCapabilitiesForType(mime).ColorFormats.Contains(colorFormat))
+                {
+                    return codecInfo.Name;
+                }
+            }
+
+            return null;
+        }
+
         private void PlatformPlay()
         {
             var device = Game.Instance.GraphicsDevice;
@@ -63,14 +81,28 @@ namespace Microsoft.Xna.Framework.Media
             mediaExtractor.SetDataSource(assetFileDescriptor);
             int trackNo = SelectVideoTrack(mediaExtractor);
             mediaExtractor.SelectTrack(trackNo);
-            var format = mediaExtractor.GetTrackFormat(trackNo);
+
+            MediaFormat format = mediaExtractor.GetTrackFormat(trackNo);
+            string mime = format.GetString(MediaFormat.KeyMime);
 
             int width = format.GetInteger(MediaFormat.KeyWidth);
             int height = format.GetInteger(MediaFormat.KeyHeight);
             videoDuration = TimeSpan.FromSeconds(format.GetLong(MediaFormat.KeyDuration) * 1e-6);
+
+            // Get a codec that can decode the video track to YUV 4:2:0 semi-planar
+            var desiredFormat = MediaCodecCapabilities.Formatyuv420semiplanar;
+            string bestDecoder = GetBestDecoder(mime, (int)desiredFormat);
+            if (null == bestDecoder)
+            {
+                throw new NotImplementedException("No decoders support " + desiredFormat + " for this video format");
+            }
+
+            // Force decoder to output YUV420sp
+            format.SetInteger(MediaFormat.KeyColorFormat, (int) desiredFormat);
+
+            // Init YUV420sp buffer & texture
             lumaBytes = width * height;
             chromaBytes = width * height / 2;
-
             lumaTex = new Texture2D(device, width, height, false, SurfaceFormat.Alpha8);
             chromaTex = new Texture2D(device, width/2, height/2, false, SurfaceFormat.Rg16);
             yuvBuffer = new byte[lumaBytes + chromaBytes];
@@ -82,7 +114,7 @@ namespace Microsoft.Xna.Framework.Media
             chromaTex.SetData(yuvBuffer, lumaBytes, chromaBytes);
 
             // Init decoder
-            decoder = MediaCodec.CreateDecoderByType(format.GetString(MediaFormat.KeyMime));
+            decoder = MediaCodec.CreateByCodecName(bestDecoder);
             // Pass in null surface to configure the codec for ByteBuffer output
             decoder.Configure(format, surface: null, crypto: null, flags: MediaCodecConfigFlags.None);
             decoder.Start();

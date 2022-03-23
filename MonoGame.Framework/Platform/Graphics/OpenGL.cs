@@ -380,6 +380,7 @@ namespace MonoGame.OpenGL
         TextureCubeMapNegativeX = 0x8516,
         TextureCubeMapNegativeY = 0x8518,
         TextureCubeMapNegativeZ = 0x851A,
+        TextureExternalOES = 0x8D65,
     }
 
     internal enum PixelInternalFormat

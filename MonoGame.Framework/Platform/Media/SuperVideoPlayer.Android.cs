@@ -1,29 +1,38 @@
 ﻿using Android.Media;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.OpenGL;
 using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 
 namespace Microsoft.Xna.Framework.Media
 {
-    public sealed partial class SuperVideoPlayer : IDisposable
+    public sealed partial class SuperVideoPlayer
+        : Java.Lang.Object
+        , IDisposable
+        , Android.Graphics.SurfaceTexture.IOnFrameAvailableListener
     {
+        private int width;
+        private int height;
+
         private MediaExtractor mediaExtractor;
 
         private volatile bool abort = false;
-        private int lumaBytes;
-        private int chromaBytes;
         private TimeSpan videoDuration = TimeSpan.Zero;
 
-        private byte[] yuvBuffer;
+        private int decoderGLTextureName = -1;
+        private int decoderGLFramebufferName = -1;
+        private byte[] rgbaBuffer;
+
         private int bufferedFrame = -1;
         private TimeSpan bufferedFrameTime = TimeSpan.Zero;
 
-        private Texture2D lumaTex;
-        private Texture2D chromaTex;
         private int renderedFrame = -1;
         private TimeSpan displayedFrameTime = TimeSpan.Zero;
+
+        private Android.Graphics.SurfaceTexture decoderSurfaceTexture = null;
+        private Android.Views.Surface decoderSurface = null;
+        private Texture2D gameTexture = null;
 
         private MediaCodec decoder;
         private Thread decoderThread;
@@ -31,11 +40,7 @@ namespace Microsoft.Xna.Framework.Media
         private const long DECODER_TIMEOUT_US = 1000000;
 
         private Stopwatch playbackStopwatch = new Stopwatch();
-
-        public object GetLock()
-        {
-            return decoderLock;
-        }
+        private TimeSpan skipFramesUntil = TimeSpan.Zero;
 
         private void PlatformInitialize()
         {
@@ -55,23 +60,6 @@ namespace Microsoft.Xna.Framework.Media
             throw new InvalidOperationException("No video track in media");
         }
 
-        private static string GetBestDecoder(string mime, int colorFormat)
-        {
-            for (int i = 0; i < MediaCodecList.CodecCount; i++)
-            {
-                MediaCodecInfo codecInfo = MediaCodecList.GetCodecInfoAt(i);
-
-                if (!codecInfo.IsEncoder
-                    && codecInfo.GetSupportedTypes().Contains(mime)
-                    && codecInfo.GetCapabilitiesForType(mime).ColorFormats.Contains(colorFormat))
-                {
-                    return codecInfo.Name;
-                }
-            }
-
-            return null;
-        }
-
         private void PlatformPlay()
         {
             var device = Game.Instance.GraphicsDevice;
@@ -85,38 +73,25 @@ namespace Microsoft.Xna.Framework.Media
             MediaFormat format = mediaExtractor.GetTrackFormat(trackNo);
             string mime = format.GetString(MediaFormat.KeyMime);
 
-            int width = format.GetInteger(MediaFormat.KeyWidth);
-            int height = format.GetInteger(MediaFormat.KeyHeight);
+            width = format.GetInteger(MediaFormat.KeyWidth);
+            height = format.GetInteger(MediaFormat.KeyHeight);
             videoDuration = TimeSpan.FromSeconds(format.GetLong(MediaFormat.KeyDuration) * 1e-6);
 
-            // Get a codec that can decode the video track to YUV 4:2:0 semi-planar
-            var desiredFormat = MediaCodecCapabilities.Formatyuv420semiplanar;
-            string bestDecoder = GetBestDecoder(mime, (int)desiredFormat);
-            if (null == bestDecoder)
-            {
-                throw new NotImplementedException("No decoders support " + desiredFormat + " for this video format");
-            }
+            // Set up public texture
+            gameTexture = new Texture2D(device, width, height, false, SurfaceFormat.Color);
+            rgbaBuffer = new byte[width * height * 4];
 
-            // Force decoder to output YUV420sp
-            format.SetInteger(MediaFormat.KeyColorFormat, (int) desiredFormat);
+            // Set up decoder texture
+            Threading.BlockOnUIThread(GenerateTextureExternalOES);
 
-            // Init YUV420sp buffer & texture
-            lumaBytes = width * height;
-            chromaBytes = width * height / 2;
-            lumaTex = new Texture2D(device, width, height, false, SurfaceFormat.Alpha8);
-            chromaTex = new Texture2D(device, width/2, height/2, false, SurfaceFormat.Rg16);
-            yuvBuffer = new byte[lumaBytes + chromaBytes];
-
-            // Init luma & chroma so the first frame isn't green
-            Array.Fill<byte>(yuvBuffer, 0, 0, lumaBytes);  // Init luma buffer
-            Array.Fill<byte>(yuvBuffer, 128, lumaBytes, chromaBytes);  // Init chroma buffer
-            lumaTex.SetData(yuvBuffer, 0, lumaBytes);
-            chromaTex.SetData(yuvBuffer, lumaBytes, chromaBytes);
+            // Set up decoder surface
+            decoderSurfaceTexture = new Android.Graphics.SurfaceTexture(decoderGLTextureName);
+            decoderSurfaceTexture.SetOnFrameAvailableListener(this);
+            decoderSurface = new Android.Views.Surface(decoderSurfaceTexture);
 
             // Init decoder
-            decoder = MediaCodec.CreateByCodecName(bestDecoder);
-            // Pass in null surface to configure the codec for ByteBuffer output
-            decoder.Configure(format, surface: null, crypto: null, flags: MediaCodecConfigFlags.None);
+            decoder = MediaCodec.CreateDecoderByType(mime);
+            decoder.Configure(format, decoderSurface, null, MediaCodecConfigFlags.None);
             decoder.Start();
 
             // Init decoder thread
@@ -125,100 +100,63 @@ namespace Microsoft.Xna.Framework.Media
             decoderThread.Start();
         }
 
+        private void GenerateTextureExternalOES()
+        {
+            GL.GenTextures(1, out decoderGLTextureName);
+            GraphicsExtensions.CheckGLError();
+            GL.BindTexture(TextureTarget.TextureExternalOES, decoderGLTextureName);
+            GraphicsExtensions.CheckGLError();
+            GL.TexParameter(TextureTarget.TextureExternalOES, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GraphicsExtensions.CheckGLError();
+            GL.TexParameter(TextureTarget.TextureExternalOES, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            GraphicsExtensions.CheckGLError();
+            GL.TexParameter(TextureTarget.TextureExternalOES, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);  // MUST be ClampToEdge for Huawei devices
+            GraphicsExtensions.CheckGLError();
+            GL.TexParameter(TextureTarget.TextureExternalOES, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+            GraphicsExtensions.CheckGLError();
+
+            GL.GenFramebuffers(1, out decoderGLFramebufferName);
+            GraphicsExtensions.CheckGLError();
+        }
+
         private void VideoLoop()
         {
             bool inputDone = false;
-            TimeSpan skipFramesUntil = TimeSpan.Zero;
+            bool outputDone = false;
 
-            while (!abort)
+            while (!abort && !outputDone)
             {
-                if (!inputDone)
+#if false
+                if (!inputDone && playbackStopwatch.IsRunning)  // Skip frames
                 {
-                    // Skip frames
-                    if (playbackStopwatch.IsRunning)
+                    while (playbackStopwatch.Elapsed.TotalSeconds > (mediaExtractor.SampleTime * 1e-6))
                     {
-                        while (playbackStopwatch.Elapsed.TotalSeconds > (mediaExtractor.SampleTime * 1e-6))
+                        skipFramesUntil = TimeSpan.FromSeconds(mediaExtractor.SampleTime * 1e-6);
+                        if (!mediaExtractor.Advance())
                         {
-                            skipFramesUntil = TimeSpan.FromSeconds(mediaExtractor.SampleTime * 1e-6);
-                            if (!mediaExtractor.Advance())
-                            {
-                                break;
-                            }
+                            inputDone = true;
+                            break;
                         }
                     }
+                }
+#endif
 
+                if (!inputDone)
+                {
                     int index = decoder.DequeueInputBuffer(DECODER_TIMEOUT_US);  // if negative, all input buffers are busy
 
                     if (index >= 0)
                     {
-                        var inputBuffer = decoder.GetInputBuffer(index);
-
-                        int sampleSize = mediaExtractor.ReadSampleData(inputBuffer, 0);
-                        if (sampleSize >= 0)
-                        {
-                            decoder.QueueInputBuffer(index, 0, sampleSize, mediaExtractor.SampleTime, 0);
-                            mediaExtractor.Advance();
-                        }
-                        else
-                        {
-                            decoder.QueueInputBuffer(index, 0, 0, 0, MediaCodecBufferFlags.EndOfStream);
-                            inputDone = true;
-                        }
+                        inputDone = OnInputBufferAvailable(index);
                     }
                 }
 
+                var outputBufferInfo = new MediaCodec.BufferInfo();
+                int outputBufferIndex = decoder.DequeueOutputBuffer(outputBufferInfo, DECODER_TIMEOUT_US);
+
+                if (outputBufferIndex >= 0)
                 {
-                    var info = new MediaCodec.BufferInfo();
-                    int index = decoder.DequeueOutputBuffer(info, DECODER_TIMEOUT_US);
-
-                    if (index >= 0)
-                    {
-                        if (info.Flags.HasFlag(MediaCodecBufferFlags.EndOfStream))
-                        {
-                            decoder.ReleaseOutputBuffer(index, false);
-                            break;
-                        }
-
-                        var presentationTime = TimeSpan.FromSeconds(info.PresentationTimeUs * 1e-6);
-
-                        // If we're skipping frames, don't update the texture
-                        if (presentationTime < skipFramesUntil)
-                        {
-                            decoder.ReleaseOutputBuffer(index, false);
-                            continue;
-                        }
-
-                        if (presentationTime < this.bufferedFrameTime)
-                        {
-                            Debug.WriteLine("Video: went back in time? " + presentationTime + " < " + this.bufferedFrameTime);
-                        }
-
-                        var thisFrame = bufferedFrame + 1;
-
-                        decoder.GetOutputBuffer(index).Get(yuvBuffer);  // can we do bb.Array to skip a copy?
-                        decoder.ReleaseOutputBuffer(index, false);
-
-                        if (thisFrame == 0)
-                        {
-                            playbackStopwatch.Restart();
-                        }
-                        else
-                        {
-                            // Sleep until presentation time before committing the buffer
-                            var delta = presentationTime - playbackStopwatch.Elapsed;
-                            if (delta.Milliseconds > 0)
-                            {
-                                //Debug.WriteLine("Video: sleep " + delta.Milliseconds + " ms before presenting");
-                                Thread.Sleep(delta.Milliseconds);
-                            }
-                        }
-
-                        lock (decoderLock)
-                        {
-                            bufferedFrameTime = presentationTime;
-                            bufferedFrame = thisFrame;  // signals that a new frame is ready once different from renderedFrame
-                        }
-                    }
+                    outputDone = OnOutputBufferAvailable(outputBufferInfo, outputBufferIndex);
                 }
             }
 
@@ -226,26 +164,92 @@ namespace Microsoft.Xna.Framework.Media
             decoder.Release();
         }
 
-        public void GetYUVTextures(out Texture2D lumaOut, out Texture2D chromaOut)
+        private bool OnInputBufferAvailable(int index)
+        {
+            var inputBuffer = decoder.GetInputBuffer(index);
+
+            int sampleSize = mediaExtractor.ReadSampleData(inputBuffer, 0);
+            if (sampleSize >= 0)
+            {
+                decoder.QueueInputBuffer(index, 0, sampleSize, mediaExtractor.SampleTime, 0);
+                mediaExtractor.Advance();
+                return false;  // input not done yet
+            }
+            else
+            {
+                decoder.QueueInputBuffer(index, 0, 0, 0, MediaCodecBufferFlags.EndOfStream);
+                return true;  // input done
+            }
+        }
+
+        private bool OnOutputBufferAvailable(MediaCodec.BufferInfo info, int index)
+        {
+            if (info.Flags.HasFlag(MediaCodecBufferFlags.EndOfStream))
+            {
+                decoder.ReleaseOutputBuffer(index, false);
+                return true;  // output done
+            }
+
+            var presentationTime = TimeSpan.FromSeconds(info.PresentationTimeUs * 1e-6);
+
+            // If we're skipping frames, don't update the texture
+            if (presentationTime < skipFramesUntil)
+            {
+                decoder.ReleaseOutputBuffer(index, false);
+                return false;  // output not done
+            }
+
+            if (presentationTime < this.bufferedFrameTime)
+            {
+                Debug.WriteLine("Video: went back in time? " + presentationTime + " < " + this.bufferedFrameTime);
+            }
+
+            var thisFrame = bufferedFrame + 1;
+
+            bool doRender = info.Size != 0;
+
+            // As soon as we call releaseOutputBuffer, the buffer will be forwarded to
+            // SurfaceTexture to convert to a texture. The API doesn't guarantee that the texture
+            // will be available before the call returns, so we need to wait for the
+            // onFrameAvailable callback to fire.
+            decoder.ReleaseOutputBuffer(index, doRender);
+
+            if (thisFrame == 0)
+            {
+                playbackStopwatch.Restart();
+            }
+            else
+            {
+                // Sleep until presentation time before committing the buffer
+                var delta = presentationTime - playbackStopwatch.Elapsed;
+                if (delta.Milliseconds > 0)
+                {
+                    //Debug.WriteLine("Video: sleep " + delta.Milliseconds + " ms before presenting");
+                    Thread.Sleep(delta.Milliseconds);
+                }
+            }
+
+            lock (decoderLock)
+            {
+                bufferedFrameTime = presentationTime;
+                bufferedFrame = thisFrame;  // signals that a new frame is ready once different from renderedFrame
+            }
+
+            return false;  // output not done
+        }
+
+        private Texture2D PlatformGetTexture()
         {
             lock (decoderLock)
             {
                 if (renderedFrame != bufferedFrame)  // new frame ready?
                 {
-                    lumaTex.SetData(yuvBuffer, 0, lumaBytes);
-                    chromaTex.SetData(yuvBuffer, lumaBytes, chromaBytes);
                     renderedFrame = bufferedFrame;
                     displayedFrameTime = bufferedFrameTime;
                 }
             }
 
-            lumaOut = lumaTex;
-            chromaOut = chromaTex;
-        }
-
-        private Texture2D PlatformGetTexture()
-        {
-            throw new InvalidOperationException("On Android, use GetYUVTextures");
+            return gameTexture;
         }
         
         private void PlatformGetState(ref MediaState result)
@@ -302,11 +306,45 @@ namespace Microsoft.Xna.Framework.Media
                 Debug.WriteLine("Video: Decoder thread joined.");
             }
 
-            lumaTex.Dispose();
-            chromaTex.Dispose();
+            if (decoderGLTextureName > 0)
+            {
+                GL.DeleteTextures(1, ref this.decoderGLTextureName);
+                decoderGLTextureName = 0;
+            }
 
-            lumaTex = null;
-            chromaTex = null;
+            if (decoderGLFramebufferName > 0)
+            {
+                GL.DeleteFramebuffers(1, ref this.decoderGLFramebufferName);
+                decoderGLFramebufferName = 0;
+            }
+
+            if (gameTexture != null)
+            {
+                gameTexture.Dispose();
+                gameTexture = null;
+            }
+        }
+
+        public void OnFrameAvailable(Android.Graphics.SurfaceTexture surfaceTexture)
+        {
+            if (abort)
+            {
+                return;
+            }
+
+            // Latch the data
+            surfaceTexture.UpdateTexImage();
+
+            // Convert to RGBA
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, decoderGLFramebufferName);
+            GraphicsExtensions.CheckGLError();
+            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.TextureExternalOES, decoderGLTextureName, 0);
+            GraphicsExtensions.CheckGLError();
+            GL.ReadPixels(0, 0, width, height, PixelFormat.Rgba, PixelType.UnsignedByte, rgbaBuffer);
+            GraphicsExtensions.CheckGLError();
+
+            // Make texture available for consumption by game
+            gameTexture.SetData(rgbaBuffer);
         }
     }
 }

@@ -41,7 +41,7 @@ namespace Microsoft.Xna.Framework
 
         public override void Exit()
         {
-            Game.Activity.Finish();
+            Environment.Exit(0);
         }
 
         public override void RunLoop()

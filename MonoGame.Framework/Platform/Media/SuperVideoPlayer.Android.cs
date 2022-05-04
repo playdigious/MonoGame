@@ -20,19 +20,15 @@ namespace Microsoft.Xna.Framework.Media
         private MediaExtractor mediaExtractor;
 
         private volatile bool abort = false;
+        private volatile bool gotFirstFrame = false;
+        private volatile bool decoderSurfaceTextureFrameAvailable = false;
+
         private TimeSpan videoDuration = TimeSpan.Zero;
+        private long decodedTimestampNanoseconds = 0;
 
         private int decoderGLTextureName = -1;
         private int decoderGLFramebufferName = -1;
         private byte[] rgbaBuffer;
-
-        private int bufferedFrame = -1;
-        private TimeSpan bufferedFrameTime = TimeSpan.Zero;
-
-        private int renderedFrame = -1;
-        private TimeSpan displayedFrameTime = TimeSpan.Zero;
-
-        private volatile bool decoderSurfaceTextureFrameAvailable = false;
 
         private Android.Graphics.SurfaceTexture decoderSurfaceTexture = null;
         private Android.Views.Surface decoderSurface = null;
@@ -84,6 +80,10 @@ namespace Microsoft.Xna.Framework.Media
             // Set up public texture
             gameTexture = new Texture2D(graphicsDevice, width, height, false, SurfaceFormat.Color);
             rgbaBuffer = new byte[width * height * 4];
+
+            // Prime texture to avoid displaying an initial garbage frame
+            // if the game attempts to draw the video before the first frame was decoded.
+            gameTexture.SetData(rgbaBuffer);
 
             // Set up decoder texture
             Threading.BlockOnUIThread(GenerateTextureExternalOES);
@@ -203,13 +203,6 @@ namespace Microsoft.Xna.Framework.Media
                 return false;  // output not done
             }
 
-            if (presentationTime < this.bufferedFrameTime)
-            {
-                Debug.WriteLine("Video: went back in time? " + presentationTime + " < " + this.bufferedFrameTime);
-            }
-
-            var thisFrame = bufferedFrame + 1;
-
             bool doRender = info.Size != 0;
 
             // As soon as we call releaseOutputBuffer, the buffer will be forwarded to
@@ -218,7 +211,7 @@ namespace Microsoft.Xna.Framework.Media
             // onFrameAvailable callback to fire.
             decoder.ReleaseOutputBuffer(index, doRender);
 
-            if (thisFrame == 0)
+            if (!gotFirstFrame)
             {
                 playbackStopwatch.Restart();
             }
@@ -233,15 +226,12 @@ namespace Microsoft.Xna.Framework.Media
                 }
             }
 
-            lock (decoderLock)
-            {
-                bufferedFrameTime = presentationTime;
-                bufferedFrame = thisFrame;  // signals that a new frame is ready once different from renderedFrame
-            }
+            gotFirstFrame = true;
 
             return false;  // output not done
         }
 
+        // Must run on main thread!
         private void UpdateTexImage()
         {
             // Save framebuffer
@@ -249,6 +239,7 @@ namespace Microsoft.Xna.Framework.Media
 
             // Latch the data
             decoderSurfaceTexture.UpdateTexImage();
+            decodedTimestampNanoseconds = decoderSurfaceTexture.Timestamp;
 
             // Convert to RGBA
             Game.Instance.GraphicsDevice.framebufferHelper.BindFramebuffer(decoderGLFramebufferName);
@@ -273,15 +264,6 @@ namespace Microsoft.Xna.Framework.Media
                 decoderSurfaceTextureFrameAvailable = false;
             }
 
-            lock (decoderLock)
-            {
-                if (renderedFrame != bufferedFrame)  // new frame ready?
-                {
-                    renderedFrame = bufferedFrame;
-                    displayedFrameTime = bufferedFrameTime;
-                }
-            }
-
             return gameTexture;
         }
         
@@ -289,7 +271,9 @@ namespace Microsoft.Xna.Framework.Media
         {
             lock (decoderLock)
             {
-                if (bufferedFrame < 0)  // not ready yet
+                if (abort)
+                    result = MediaState.Stopped;
+                else if (!gotFirstFrame)  // not ready yet
                     result = MediaState.Paused;
                 else if (decoderThread == null || !decoderThread.IsAlive)
                     result = MediaState.Stopped;
@@ -315,7 +299,7 @@ namespace Microsoft.Xna.Framework.Media
 
         private TimeSpan PlatformGetPlayPosition()
         {
-            return bufferedFrameTime;
+            return TimeSpan.FromSeconds(decodedTimestampNanoseconds * 1e-9);
         }
 
         private TimeSpan PlatformGetDuration()
@@ -347,7 +331,7 @@ namespace Microsoft.Xna.Framework.Media
 
             if (decoderGLFramebufferName > 0)
             {
-                GL.DeleteFramebuffers(1, ref this.decoderGLFramebufferName);
+                graphicsDevice.framebufferHelper.DeleteFramebuffer(decoderGLFramebufferName);
                 decoderGLFramebufferName = 0;
             }
 

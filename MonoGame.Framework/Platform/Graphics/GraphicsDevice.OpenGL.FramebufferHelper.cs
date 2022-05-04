@@ -48,10 +48,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
             public bool SupportsBlitFramebuffer { get; private set; }
 
+            internal int BoundFramebuffer { get; private set; }
+            internal int BoundReadFramebuffer { get; private set; }
+
             internal FramebufferHelper(GraphicsDevice graphicsDevice)
             {
                 this.SupportsBlitFramebuffer = GL.BlitFramebuffer != null;
                 this.SupportsInvalidateFramebuffer = GL.InvalidateFramebuffer != null;
+                this.BoundFramebuffer = -1;
+                this.BoundReadFramebuffer = -1;
             }
 
             internal virtual void GenRenderbuffer(out int renderbuffer)
@@ -91,12 +96,16 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebuffer);
                 GraphicsExtensions.CheckGLError();
+
+                BoundFramebuffer = framebuffer;
             }
 
             internal virtual void BindReadFramebuffer(int readFramebuffer)
             {
                 GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, readFramebuffer);
                 GraphicsExtensions.CheckGLError();
+
+                BoundReadFramebuffer = readFramebuffer;
             }
 
             static readonly FramebufferAttachment [] FramebufferAttachements = {

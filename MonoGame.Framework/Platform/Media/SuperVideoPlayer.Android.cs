@@ -12,6 +12,8 @@ namespace Microsoft.Xna.Framework.Media
         , IDisposable
         , Android.Graphics.SurfaceTexture.IOnFrameAvailableListener
     {
+        private GraphicsDevice graphicsDevice;
+
         private int width;
         private int height;
 
@@ -30,6 +32,8 @@ namespace Microsoft.Xna.Framework.Media
         private int renderedFrame = -1;
         private TimeSpan displayedFrameTime = TimeSpan.Zero;
 
+        private volatile bool decoderSurfaceTextureFrameAvailable = false;
+
         private Android.Graphics.SurfaceTexture decoderSurfaceTexture = null;
         private Android.Views.Surface decoderSurface = null;
         private Texture2D gameTexture = null;
@@ -44,6 +48,7 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformInitialize()
         {
+            graphicsDevice = Game.Instance.GraphicsDevice;
         }
 
         private static int SelectVideoTrack(MediaExtractor mediaExtractor)
@@ -62,7 +67,6 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformPlay()
         {
-            var device = Game.Instance.GraphicsDevice;
             var assetFileDescriptor = Game.Activity.Assets.OpenFd(_videoPath);
 
             mediaExtractor = new MediaExtractor();
@@ -78,13 +82,14 @@ namespace Microsoft.Xna.Framework.Media
             videoDuration = TimeSpan.FromSeconds(format.GetLong(MediaFormat.KeyDuration) * 1e-6);
 
             // Set up public texture
-            gameTexture = new Texture2D(device, width, height, false, SurfaceFormat.Color);
+            gameTexture = new Texture2D(graphicsDevice, width, height, false, SurfaceFormat.Color);
             rgbaBuffer = new byte[width * height * 4];
 
             // Set up decoder texture
             Threading.BlockOnUIThread(GenerateTextureExternalOES);
 
             // Set up decoder surface
+            decoderSurfaceTextureFrameAvailable = false;
             decoderSurfaceTexture = new Android.Graphics.SurfaceTexture(decoderGLTextureName);
             decoderSurfaceTexture.SetOnFrameAvailableListener(this);
             decoderSurface = new Android.Views.Surface(decoderSurfaceTexture);
@@ -115,8 +120,7 @@ namespace Microsoft.Xna.Framework.Media
             GL.TexParameter(TextureTarget.TextureExternalOES, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
             GraphicsExtensions.CheckGLError();
 
-            GL.GenFramebuffers(1, out decoderGLFramebufferName);
-            GraphicsExtensions.CheckGLError();
+            graphicsDevice.framebufferHelper.GenFramebuffer(out decoderGLFramebufferName);
         }
 
         private void VideoLoop()
@@ -238,8 +242,37 @@ namespace Microsoft.Xna.Framework.Media
             return false;  // output not done
         }
 
+        private void UpdateTexImage()
+        {
+            // Save framebuffer
+            int lastFB = graphicsDevice.framebufferHelper.BoundFramebuffer;
+
+            // Latch the data
+            decoderSurfaceTexture.UpdateTexImage();
+
+            // Convert to RGBA
+            Game.Instance.GraphicsDevice.framebufferHelper.BindFramebuffer(decoderGLFramebufferName);
+            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.TextureExternalOES, decoderGLTextureName, 0);
+            GraphicsExtensions.CheckGLError();
+            GL.ReadPixels(0, 0, width, height, PixelFormat.Rgba, PixelType.UnsignedByte, rgbaBuffer);
+            GraphicsExtensions.CheckGLError();
+
+            // Make texture available for consumption by game
+            gameTexture.SetData(rgbaBuffer);
+
+            // Restore framebuffer
+            Game.Instance.GraphicsDevice.framebufferHelper.BindFramebuffer(lastFB);
+        }
+
         private Texture2D PlatformGetTexture()
         {
+            if (decoderSurfaceTextureFrameAvailable)
+            {
+                UpdateTexImage();
+
+                decoderSurfaceTextureFrameAvailable = false;
+            }
+
             lock (decoderLock)
             {
                 if (renderedFrame != bufferedFrame)  // new frame ready?
@@ -332,19 +365,7 @@ namespace Microsoft.Xna.Framework.Media
                 return;
             }
 
-            // Latch the data
-            surfaceTexture.UpdateTexImage();
-
-            // Convert to RGBA
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, decoderGLFramebufferName);
-            GraphicsExtensions.CheckGLError();
-            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.TextureExternalOES, decoderGLTextureName, 0);
-            GraphicsExtensions.CheckGLError();
-            GL.ReadPixels(0, 0, width, height, PixelFormat.Rgba, PixelType.UnsignedByte, rgbaBuffer);
-            GraphicsExtensions.CheckGLError();
-
-            // Make texture available for consumption by game
-            gameTexture.SetData(rgbaBuffer);
+            decoderSurfaceTextureFrameAvailable = true;
         }
     }
 }

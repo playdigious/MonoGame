@@ -141,6 +141,9 @@ namespace Microsoft.Xna.Framework.Input
                     if (controller.ExtendedGamepad.ButtonY.IsPressed)
                         buttons |= Buttons.Y;
 
+                    if (controller.ExtendedGamepad.ButtonMenu.IsPressed)
+                        buttons |= Buttons.Start;
+
                     if (controller.ExtendedGamepad.LeftShoulder.IsPressed)
                         buttons |= Buttons.LeftShoulder;
                     if (controller.ExtendedGamepad.RightShoulder.IsPressed)

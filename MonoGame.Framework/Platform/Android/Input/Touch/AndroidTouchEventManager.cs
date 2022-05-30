@@ -27,6 +27,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
             if (!Enabled)
                 return;
 
+            if (e.ActionIndex >= e.PointerCount || e.ActionIndex < 0)
+            {
+                return;
+            }
+
             Vector2 position = Vector2.Zero;
             position.X = e.GetX(e.ActionIndex);
             position.Y = e.GetY(e.ActionIndex);

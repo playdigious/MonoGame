@@ -30,11 +30,25 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
         {
-            this.glTarget = TextureTarget.Texture2D;
+            if (type == SurfaceType.TextureExternalOES)
+            {
+                this.glTarget = TextureTarget.TextureExternalOES;
+            }
+            else
+            {
+                this.glTarget = TextureTarget.Texture2D;
+            }
+
             format.GetGLFormat(GraphicsDevice, out glInternalFormat, out glFormat, out glType);
             Threading.BlockOnUIThread(() =>
             {
                 GenerateGLTextureIfRequired();
+
+                if (type == SurfaceType.TextureExternalOES)
+                {
+                    return;
+                }
+
                 int w = width;
                 int h = height;
                 int level = 0;
@@ -67,7 +81,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
                     else
                     {
-                        GL.TexImage2D(TextureTarget.Texture2D, level, glInternalFormat, w, h, 0, glFormat, glType, IntPtr.Zero);
+                        GL.TexImage2D(this.glTarget, level, glInternalFormat, w, h, 0, glFormat, glType, IntPtr.Zero);
                         GraphicsExtensions.CheckGLError();
                     }
 
@@ -84,6 +98,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSetData<T>(int level, T[] data, int startIndex, int elementCount) where T : struct
         {
+            if (this.glTarget == TextureTarget.TextureExternalOES)
+            {
+                throw new NotSupportedException("Texture external eos can't be set.");
+            }
+
             int w, h;
             GetSizeForLevel(Width, Height, level, out w, out h);
             Threading.BlockOnUIThread(() =>
@@ -139,6 +158,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSetData<T>(int level, int arraySlice, Rectangle rect, T[] data, int startIndex, int elementCount) where T : struct
         {
+            if (this.glTarget == TextureTarget.TextureExternalOES)
+            {
+                throw new NotSupportedException("Texture external eos can't be set.");
+            }
+
             Threading.BlockOnUIThread(() =>
             {
                 var elementSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
@@ -204,7 +228,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebufferId);
             GraphicsExtensions.CheckGLError();
-            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, this.glTexture, 0);
+            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, this.glTarget, this.glTexture, 0);
             GraphicsExtensions.CheckGLError();
 
             GL.ReadPixels(rect.X, rect.Y, rect.Width, rect.Height, this.glFormat, this.glType, data);
@@ -406,35 +430,35 @@ namespace Microsoft.Xna.Framework.Graphics
                 // For best compatibility and to keep the default wrap mode of XNA, only set ClampToEdge if either
                 // dimension is not a power of two.
                 var wrap = TextureWrapMode.Repeat;
-                if (((width & (width - 1)) != 0) || ((height & (height - 1)) != 0))
+                if (((width & (width - 1)) != 0) || ((height & (height - 1)) != 0) || this.glTarget == TextureTarget.TextureExternalOES)
                     wrap = TextureWrapMode.ClampToEdge;
 
-                GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
+                GL.BindTexture(this.glTarget, this.glTexture);
                 GraphicsExtensions.CheckGLError();
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
+                GL.TexParameter(this.glTarget, TextureParameterName.TextureMinFilter,
                                 (_levelCount > 1) ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
                 GraphicsExtensions.CheckGLError();
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter,
+                GL.TexParameter(this.glTarget, TextureParameterName.TextureMagFilter,
                                 (int)TextureMagFilter.Linear);
                 GraphicsExtensions.CheckGLError();
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)wrap);
+                GL.TexParameter(this.glTarget, TextureParameterName.TextureWrapS, (int)wrap);
                 GraphicsExtensions.CheckGLError();
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)wrap);
+                GL.TexParameter(this.glTarget, TextureParameterName.TextureWrapT, (int)wrap);
                 GraphicsExtensions.CheckGLError();
                 // Set mipmap levels
 #if !GLES
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureBaseLevel, 0);
 #endif
                 GraphicsExtensions.CheckGLError();
-                if (GraphicsDevice.GraphicsCapabilities.SupportsTextureMaxLevel)
+                if (GraphicsDevice.GraphicsCapabilities.SupportsTextureMaxLevel && this.glTarget != TextureTarget.TextureExternalOES)
                 {
                     if (_levelCount > 0)
                     {
-                        GL.TexParameter(TextureTarget.Texture2D, SamplerState.TextureParameterNameTextureMaxLevel, _levelCount - 1);
+                        GL.TexParameter(this.glTarget, SamplerState.TextureParameterNameTextureMaxLevel, _levelCount - 1);
                     }
                     else
                     {
-                        GL.TexParameter(TextureTarget.Texture2D, SamplerState.TextureParameterNameTextureMaxLevel, 1000);
+                        GL.TexParameter(this.glTarget, SamplerState.TextureParameterNameTextureMaxLevel, 1000);
                     }
                     GraphicsExtensions.CheckGLError();
                 }

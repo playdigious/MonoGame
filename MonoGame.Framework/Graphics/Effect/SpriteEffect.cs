@@ -39,6 +39,13 @@ namespace Microsoft.Xna.Framework.Graphics
             CacheEffectParameters();
         }
 
+        /// <summary>
+        /// Creates a new SpriteEffect with desired effect code.
+        /// </summary>
+        protected SpriteEffect(GraphicsDevice device, byte[] effectCode) : base (device, effectCode)
+        {
+            CacheEffectParameters();
+        }
 
         /// <summary>
         /// Creates a clone of the current SpriteEffect instance.

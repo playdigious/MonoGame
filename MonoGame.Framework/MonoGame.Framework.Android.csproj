@@ -63,6 +63,7 @@
     <Compile Include="Platform\Media\MediaPlayer.Default.cs" />
     <Compile Include="Platform\Media\Song.Android.cs" />
     <Compile Include="Platform\Media\SuperVideoPlayer.Android.cs" />
+    <Compile Include="Platform\Media\SuperVideoPlayer.Android.Obsolete.cs" />
     <Compile Include="Platform\Media\Video.Android.cs" />
     <Compile Include="Platform\Media\VideoPlayer.Android.cs" />
     <Compile Include="Platform\PrimaryThreadLoader.cs" />

@@ -23,8 +23,14 @@ namespace Microsoft.Xna.Framework.Graphics
 		Effect _effect;
         bool _beginCalled;
 
-		SpriteEffect _spriteEffect;
-        readonly EffectPass _spritePass;
+		protected SpriteEffect _spriteEffect;
+        protected EffectPass _spritePass
+        {
+            get
+            {
+                return _spriteEffect.CurrentTechnique.Passes[0];
+            }
+        }
 
 		Rectangle _tempRect = new Rectangle (0,0,0,0);
 		Vector2 _texCoordTL = new Vector2 (0,0);
@@ -56,7 +62,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			this.GraphicsDevice = graphicsDevice;
 
             _spriteEffect = new SpriteEffect(graphicsDevice);
-            _spritePass = _spriteEffect.CurrentTechnique.Passes[0];
 
             _batcher = new SpriteBatcher(graphicsDevice, capacity);
 

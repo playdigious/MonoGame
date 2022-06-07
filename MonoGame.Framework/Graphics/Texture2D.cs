@@ -17,10 +17,13 @@ namespace Microsoft.Xna.Framework.Graphics
             Texture,
             RenderTarget,
             SwapChainRenderTarget,
+#if OPENGL
+            TextureExternalOES,
+#endif
         }
 
-		internal int width;
-		internal int height;
+        internal int width;
+        internal int height;
         internal int ArraySize;
                 
         internal float TexelWidth { get; private set; }

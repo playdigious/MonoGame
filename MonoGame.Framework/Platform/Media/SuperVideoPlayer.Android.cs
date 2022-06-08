@@ -19,6 +19,7 @@ namespace Microsoft.Xna.Framework.Media
         private Android.Graphics.SurfaceTexture surfaceTexture = null;
         private Android.Views.Surface surface = null;
         private TextureEOS2D eosTexture = null;
+        private int currentPosition = 0;
 
         private Android.Media.MediaPlayer player;
 
@@ -27,6 +28,7 @@ namespace Microsoft.Xna.Framework.Media
             graphicsDevice = Game.Instance.GraphicsDevice;
             player = new Android.Media.MediaPlayer();
             player.SetOnCompletionListener(this);
+            currentPosition = 0;
 
             // Set up eos texture
             eosTexture = new TextureEOS2D(graphicsDevice);
@@ -37,7 +39,6 @@ namespace Microsoft.Xna.Framework.Media
             surfaceTexture.SetOnFrameAvailableListener(this);
             surface = new Android.Views.Surface(surfaceTexture);
             player.SetSurface(surface);
-
         }
 
         private void PlatformPlay()
@@ -70,19 +71,6 @@ namespace Microsoft.Xna.Framework.Media
         
         private void PlatformGetState(ref MediaState result)
         {
-
-            if (player.IsPlaying)
-            {
-                result = MediaState.Playing;
-            }
-            else if (prepared)
-            {
-                result = MediaState.Paused;
-            }
-            else
-            {
-                result = MediaState.Stopped;
-            }
         }
 
         private void PlatformPause()
@@ -134,7 +122,7 @@ namespace Microsoft.Xna.Framework.Media
                 return TimeSpan.FromMilliseconds(0);
             }
 
-            return TimeSpan.FromMilliseconds(player.CurrentPosition);
+            return TimeSpan.FromMilliseconds(currentPosition);
         }
 
         private TimeSpan PlatformGetDuration()
@@ -179,13 +167,18 @@ namespace Microsoft.Xna.Framework.Media
                 return;
             }
 
+            // Prevent weird 100ms set after OnCompletion
+            if (currentPosition != player.Duration)
+            {
+                currentPosition = player.CurrentPosition;
+            }
             surfaceTextureFrameAvailable = true;
         }
 
         /// <inheritdoc/>
         public void OnCompletion(Android.Media.MediaPlayer mp)
         {
-            prepared = false;
+            currentPosition = player.Duration;
         }
     }
 }

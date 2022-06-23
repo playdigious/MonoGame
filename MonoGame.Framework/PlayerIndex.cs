@@ -24,6 +24,14 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// The fourth player index.
         /// </summary>
-        Four = 3
+        Four = 3,
+        /// <summary>
+        /// The fifth player index.
+        /// </summary>
+        Five = 4,
+        /// <summary>
+        /// The sixth player index.
+        /// </summary>
+        Six = 5
     }
 }

@@ -5,10 +5,6 @@ using System;
 namespace Microsoft.Xna.Framework.Media
 {
     public sealed partial class SuperVideoPlayer
-        : Java.Lang.Object
-        , IDisposable
-        , Android.Graphics.SurfaceTexture.IOnFrameAvailableListener
-        , Android.Media.MediaPlayer.IOnCompletionListener
     {
         private GraphicsDevice graphicsDevice;
 
@@ -27,7 +23,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             graphicsDevice = Game.Instance.GraphicsDevice;
             player = new Android.Media.MediaPlayer();
-            player.SetOnCompletionListener(this);
+            player.Completion += Player_Completion;
             currentPosition = 0;
 
             // Set up eos texture
@@ -36,7 +32,7 @@ namespace Microsoft.Xna.Framework.Media
             // Set up surface
             surfaceTextureFrameAvailable = false;
             surfaceTexture = new Android.Graphics.SurfaceTexture(eosTexture.glTexture);
-            surfaceTexture.SetOnFrameAvailableListener(this);
+            surfaceTexture.FrameAvailable += SurfaceTexture_FrameAvailable;
             surface = new Android.Views.Surface(surfaceTexture);
             player.SetSurface(surface);
         }
@@ -145,8 +141,11 @@ namespace Microsoft.Xna.Framework.Media
             disposed = true;
             prepared = false;
 
+            graphicsDevice = null;
+
             if (player != null)
             {
+                player.Completion -= Player_Completion;
                 player.Release();
                 player.Dispose();
                 player = null;
@@ -157,10 +156,24 @@ namespace Microsoft.Xna.Framework.Media
                 eosTexture.Dispose();
                 eosTexture = null;
             }
+
+            if (surfaceTexture != null)
+            {
+                surfaceTexture.FrameAvailable -= SurfaceTexture_FrameAvailable;
+                surfaceTexture.Release();
+                surfaceTexture.Dispose();
+                surfaceTexture = null;
+            }
+
+            if (surface != null)
+            {
+                surface.Release();
+                surface.Dispose();
+                surface = null;
+            }
         }
 
-        /// <inheritdoc/>
-        public void OnFrameAvailable(Android.Graphics.SurfaceTexture surfaceTexture)
+        private void SurfaceTexture_FrameAvailable(object sender, Android.Graphics.SurfaceTexture.FrameAvailableEventArgs e)
         {
             if (disposed)
             {
@@ -175,8 +188,7 @@ namespace Microsoft.Xna.Framework.Media
             surfaceTextureFrameAvailable = true;
         }
 
-        /// <inheritdoc/>
-        public void OnCompletion(Android.Media.MediaPlayer mp)
+        private void Player_Completion(object sender, EventArgs e)
         {
             currentPosition = player.Duration;
         }

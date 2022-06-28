@@ -100,7 +100,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (this.glTarget == TextureTarget.TextureExternalOES)
             {
-                throw new NotSupportedException("Texture external eos can't be set.");
+                throw new NotSupportedException("Texture external oes can't be set.");
             }
 
             int w, h;
@@ -160,7 +160,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (this.glTarget == TextureTarget.TextureExternalOES)
             {
-                throw new NotSupportedException("Texture external eos can't be set.");
+                throw new NotSupportedException("Texture external oes can't be set.");
             }
 
             Threading.BlockOnUIThread(() =>

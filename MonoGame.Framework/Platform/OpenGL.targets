@@ -32,7 +32,7 @@
     <Compile Include="Platform\Graphics\States\SamplerState.OpenGL.cs" />
     <Compile Include="Platform\Graphics\Texture.OpenGL.cs" />
     <Compile Include="Platform\Graphics\Texture2D.OpenGL.cs" />
-    <Compile Include="Platform\Graphics\TextureEOS2D.OpenGL.cs" />
+    <Compile Include="Platform\Graphics\TextureOES2D.OpenGL.cs" />
     <Compile Include="Platform\Graphics\Texture3D.OpenGL.cs" />
     <Compile Include="Platform\Graphics\TextureCollection.OpenGL.cs" />
     <Compile Include="Platform\Graphics\TextureCube.OpenGL.cs" />
@@ -49,7 +49,7 @@
     <EmbeddedResource Include="Platform\Graphics\Effect\Resources\EnvironmentMapEffect.ogl.mgfxo" />
     <EmbeddedResource Include="Platform\Graphics\Effect\Resources\SkinnedEffect.ogl.mgfxo" />
     <EmbeddedResource Include="Platform\Graphics\Effect\Resources\SpriteEffect.ogl.mgfxo" />
-    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\SpriteEOSEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\SpriteOESEffect.ogl.mgfxo" />
   </ItemGroup>
 
 </Project>

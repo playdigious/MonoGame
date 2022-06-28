@@ -7,7 +7,8 @@ namespace Microsoft.Xna.Framework.Media
 {
     public sealed partial class SuperVideoPlayer : IDisposable
     {
-
+        private float _volume = 1.0f;
+        private float _mutedVolume = 1.0f;
         private MediaState _state;
         private string _videoPath;
 
@@ -51,6 +52,41 @@ namespace Microsoft.Xna.Framework.Media
 #endif
                 return _state;
 
+            }
+        }
+
+        public float Volume
+        {
+            get
+            {
+                return _volume;
+            }
+
+            set
+            {
+                PlatformSetVolume(value);
+                _volume = value;
+            }
+        }
+
+        public bool IsMuted
+        {
+            get
+            {
+                return Volume == 0.0f;
+            }
+
+            set
+            {
+                if (value)
+                {
+                    _mutedVolume = Volume;
+                    Volume = 0.0f;
+                }
+                else
+                {
+                    Volume = _mutedVolume;
+                }
             }
         }
 

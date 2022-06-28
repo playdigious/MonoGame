@@ -14,7 +14,9 @@ namespace Microsoft.Xna.Framework.Media
 
         private Android.Graphics.SurfaceTexture surfaceTexture = null;
         private Android.Views.Surface surface = null;
-        private TextureEOS2D eosTexture = null;
+        private TextureOES2D oesTexture = null;
+        private RenderTarget2D texture = null;
+        private SpriteOESBatch spriteOESBatch = null;
         private int currentPosition = 0;
 
         private Android.Media.MediaPlayer player;
@@ -26,12 +28,15 @@ namespace Microsoft.Xna.Framework.Media
             player.Completion += Player_Completion;
             currentPosition = 0;
 
-            // Set up eos texture
-            eosTexture = new TextureEOS2D(graphicsDevice);
+            // Set up oes texture
+            oesTexture = new TextureOES2D(graphicsDevice);
+
+            // Set up sprite batch
+            spriteOESBatch = new SpriteOESBatch(graphicsDevice);
 
             // Set up surface
             surfaceTextureFrameAvailable = false;
-            surfaceTexture = new Android.Graphics.SurfaceTexture(eosTexture.glTexture);
+            surfaceTexture = new Android.Graphics.SurfaceTexture(oesTexture.glTexture);
             surfaceTexture.FrameAvailable += SurfaceTexture_FrameAvailable;
             surface = new Android.Views.Surface(surfaceTexture);
             player.SetSurface(surface);
@@ -45,9 +50,21 @@ namespace Microsoft.Xna.Framework.Media
             player.Prepare();
             prepared = true;
 
-            // Update eos size
-            eosTexture.Width = player.VideoWidth;
-            eosTexture.Height = player.VideoHeight;
+            // Update oes size
+            oesTexture.Width = player.VideoWidth;
+            oesTexture.Height = player.VideoHeight;
+
+            // Set up render target
+            if (texture == null || texture.Width != player.VideoWidth || texture.Height != player.VideoHeight)
+            {
+                if (texture != null)
+                {
+                    texture.Dispose();
+                    texture = null;
+                }
+
+                texture = new RenderTarget2D(graphicsDevice, player.VideoWidth, player.VideoHeight);
+            }
 
             player.Start();
         }
@@ -60,9 +77,15 @@ namespace Microsoft.Xna.Framework.Media
                 surfaceTexture.UpdateTexImage();
 
                 surfaceTextureFrameAvailable = false;
+
+                graphicsDevice.SetRenderTarget(texture);
+                spriteOESBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+                spriteOESBatch.Draw(oesTexture, new Rectangle(0, 0, texture.Width, texture.Height), Color.White);
+                spriteOESBatch.End();
+                graphicsDevice.SetRenderTarget(null);
             }
 
-            return eosTexture;
+            return texture;
         }
         
         private void PlatformGetState(ref MediaState result)
@@ -131,6 +154,14 @@ namespace Microsoft.Xna.Framework.Media
             return TimeSpan.FromMilliseconds(player.Duration);
         }
 
+        private void PlatformSetVolume(float value)
+        {
+            if (player != null)
+            {
+                player.SetVolume(value, value);
+            }
+        }
+
         private void PlatformDispose(bool disposing)
         {
             if (disposed)
@@ -151,10 +182,10 @@ namespace Microsoft.Xna.Framework.Media
                 player = null;
             }
 
-            if (eosTexture != null)
+            if (oesTexture != null)
             {
-                eosTexture.Dispose();
-                eosTexture = null;
+                oesTexture.Dispose();
+                oesTexture = null;
             }
 
             if (surfaceTexture != null)

@@ -93,8 +93,7 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformResume()
         {
-            if (_avPlayer == null)
-                return;
+            if (_avPlayer == null) return;
 
             _avPlayer.Play();
         }
@@ -139,6 +138,13 @@ namespace Microsoft.Xna.Framework.Media
             _avPlayer.Dispose();
             _avPlayerItem.Dispose();
             _avPlayerItemVideoOutput.Dispose();
+        }
+
+        private void PlatformSetVolume(float value)
+        {
+            if (_avPlayer == null) return;
+
+            _avPlayer.Volume = value;
         }
     }
 }

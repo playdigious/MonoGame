@@ -16,12 +16,18 @@ namespace Microsoft.Xna.Framework.Media
         private AVPlayerItem _avPlayerItem;
         private AVPlayerItemVideoOutput _avPlayerItemVideoOutput;
         private Texture2D _lastTexture;
+        private RenderTarget2D _processedTexture;
+        private SpriteBatch _spriteBatch;
+        private SwipeRBEffect _swipeRBEffect;
         private CoreVideo.CVPixelBufferAttributes _videoPixelBufferAttributes;
+        private byte[] _buffer = null;
 
         private void PlatformInitialize()
         {
             _videoPixelBufferAttributes = new CoreVideo.CVPixelBufferAttributes();
             _videoPixelBufferAttributes.PixelFormatType = CoreVideo.CVPixelFormatType.CV32BGRA;
+            _spriteBatch = new SpriteBatch(Game.Instance.GraphicsDevice);
+            _swipeRBEffect = new SwipeRBEffect(Game.Instance.GraphicsDevice);
         }
 
         /// <summary>
@@ -43,25 +49,59 @@ namespace Microsoft.Xna.Framework.Media
                     int bufferHeight = (int)pixelBuffer.Height;
                     pixelBuffer.Lock(CoreVideo.CVPixelBufferLock.ReadOnly);
 
-                    _lastTexture = new Texture2D(Game.Instance.GraphicsDevice,
-                                                bufferWidth,
-                                                bufferHeight,
-                                                false,
-                                                SurfaceFormat.Color);
+                    if (_processedTexture == null || _processedTexture.Width != bufferWidth || _processedTexture.Height != bufferHeight)
+                    {
+                        if (_processedTexture != null)
+                        {
+                            _processedTexture.Dispose();
+                            _processedTexture = null;
+                        }
+
+                        if (_lastTexture != null)
+                        {
+                            _lastTexture.Dispose();
+                            _lastTexture = null;
+                        }
+
+                        _lastTexture = new Texture2D(Game.Instance.GraphicsDevice,
+                                                    bufferWidth,
+                                                    bufferHeight,
+                                                    false,
+                                                    SurfaceFormat.Color);
+
+                        _processedTexture = new RenderTarget2D(Game.Instance.GraphicsDevice,
+                                                    bufferWidth,
+                                                    bufferHeight,
+                                                    false,
+                                                    SurfaceFormat.Color,
+                                                    DepthFormat.None);
+                    }
 
                     IntPtr pixelBufferPtr = pixelBuffer.BaseAddress;
-                    byte[] buffer = new byte[bufferWidth * bufferHeight * 4];
-                    Marshal.Copy(pixelBufferPtr, buffer, 0, bufferWidth * bufferHeight * 4);
-                    _lastTexture.SetData(buffer);
+
+                    int bufferSize = bufferWidth * bufferHeight * 4;
+                    if (_buffer == null || _buffer.Length != bufferSize)
+                    {
+                        _buffer = new byte[bufferWidth * bufferHeight * 4];
+                    }
+
+                    Marshal.Copy(pixelBufferPtr, _buffer, 0, bufferWidth * bufferHeight * 4);
+                    _lastTexture.SetData(_buffer);
+
+                    Game.Instance.GraphicsDevice.SetRenderTarget(_processedTexture);
+                    _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, effect: _swipeRBEffect);
+                    _spriteBatch.Draw(_lastTexture, new Rectangle(0, 0, _lastTexture.Width, _lastTexture.Height), Color.White);
+                    _spriteBatch.End();
+                    Game.Instance.GraphicsDevice.SetRenderTarget(null);
                 }
             }
 
-            if (_lastTexture == null)
+            if (_processedTexture == null)
             {
-                _lastTexture = new Texture2D(Game.Instance.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
+                _processedTexture = new RenderTarget2D(Game.Instance.GraphicsDevice, 1, 1, false, SurfaceFormat.Color, DepthFormat.None);
             }
 
-            return _lastTexture;
+            return _processedTexture;
         }
 
 

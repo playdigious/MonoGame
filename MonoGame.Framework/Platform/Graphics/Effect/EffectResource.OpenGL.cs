@@ -13,5 +13,6 @@ namespace Microsoft.Xna.Framework.Graphics
         const string SkinnedEffectName = "Microsoft.Xna.Framework.Platform.Graphics.Effect.Resources.SkinnedEffect.ogl.mgfxo";
         const string SpriteEffectName = "Microsoft.Xna.Framework.Platform.Graphics.Effect.Resources.SpriteEffect.ogl.mgfxo";
         const string SpriteOESEffectName = "Microsoft.Xna.Framework.Platform.Graphics.Effect.Resources.SpriteOESEffect.ogl.mgfxo";
+        const string SwipeRBEffectName = "Microsoft.Xna.Framework.Platform.Graphics.Effect.Resources.SwipeRB.ogl.mgfxo";
     }
 }

@@ -20,6 +20,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public static readonly EffectResource SpriteEffect = new EffectResource(SpriteEffectName);
 #if OPENGL
         public static readonly EffectResource SpriteOESEffect = new EffectResource(SpriteOESEffectName);
+        public static readonly EffectResource SwipeRBEffect = new EffectResource(SwipeRBEffectName);
 #endif
 
         private readonly object _locker = new object();

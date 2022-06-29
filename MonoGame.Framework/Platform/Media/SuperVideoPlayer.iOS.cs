@@ -67,6 +67,21 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformGetState(ref MediaState result)
         {
+            // Force stopped state when duration is full
+            if (_avPlayer == null)
+            {
+                return;
+            }
+
+            if (PlayPosition == TimeSpan.Zero && Duration == TimeSpan.Zero)
+            {
+                return;
+            }
+
+            if (PlayPosition >= Duration)
+            {
+                result = MediaState.Stopped;
+            }
         }
 
         private void PlatformPause()

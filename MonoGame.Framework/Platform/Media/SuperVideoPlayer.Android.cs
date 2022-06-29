@@ -63,7 +63,7 @@ namespace Microsoft.Xna.Framework.Media
                     texture = null;
                 }
 
-                texture = new RenderTarget2D(graphicsDevice, player.VideoWidth, player.VideoHeight);
+                texture = new RenderTarget2D(graphicsDevice, player.VideoWidth, player.VideoHeight, false, SurfaceFormat.Color, DepthFormat.None);
             }
 
             player.Start();
@@ -83,6 +83,11 @@ namespace Microsoft.Xna.Framework.Media
                 spriteOESBatch.Draw(oesTexture, new Rectangle(0, 0, texture.Width, texture.Height), Color.White);
                 spriteOESBatch.End();
                 graphicsDevice.SetRenderTarget(null);
+            }
+
+            if (texture == null)
+            {
+                texture = new RenderTarget2D(graphicsDevice, 1, 1, false, SurfaceFormat.Color, DepthFormat.None);
             }
 
             return texture;
@@ -195,6 +200,18 @@ namespace Microsoft.Xna.Framework.Media
                 player.Release();
                 player.Dispose();
                 player = null;
+            }
+
+            if (texture != null)
+            {
+                texture.Dispose();
+                texture = null;
+            }
+
+            if (spriteOESBatch != null)
+            {
+                spriteOESBatch.Dispose();
+                spriteOESBatch = null;
             }
 
             if (oesTexture != null)

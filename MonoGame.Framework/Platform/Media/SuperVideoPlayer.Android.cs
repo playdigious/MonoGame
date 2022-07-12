@@ -78,11 +78,17 @@ namespace Microsoft.Xna.Framework.Media
 
                 surfaceTextureFrameAvailable = false;
 
+                RenderTargetBinding[] previousBindings = graphicsDevice.GetRenderTargets();
+                Viewport previousViewport = graphicsDevice.Viewport;
+
+                graphicsDevice.Viewport = new Viewport(0, 0, texture.Width, texture.Height);
                 graphicsDevice.SetRenderTarget(texture);
                 spriteOESBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
                 spriteOESBatch.Draw(oesTexture, new Rectangle(0, 0, texture.Width, texture.Height), Color.White);
                 spriteOESBatch.End();
-                graphicsDevice.SetRenderTarget(null);
+
+                graphicsDevice.SetRenderTargets(previousBindings);
+                graphicsDevice.Viewport = previousViewport;
             }
 
             if (texture == null)

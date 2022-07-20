@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using MonoGame.Framework.Utilities;
 
-internal static class Sdl
+public static class Sdl
 {
     public static IntPtr NativeLibrary = GetNativeLibrary();
 
@@ -140,6 +140,130 @@ internal static class Sdl
         public byte Patch;
     }
 
+    #region UTF8 Marshaling
+
+    /* Used for stack allocated string marshaling. */
+    internal static int Utf8Size(string str)
+    {
+        Debug.Assert(str != null);
+        return (str.Length * 4) + 1;
+    }
+    internal static int Utf8SizeNullable(string str)
+    {
+        return str != null ? (str.Length * 4) + 1 : 0;
+    }
+    internal static unsafe byte* Utf8Encode(string str, byte* buffer, int bufferSize)
+    {
+        Debug.Assert(str != null);
+        fixed (char* strPtr = str)
+        {
+            Encoding.UTF8.GetBytes(strPtr, str.Length + 1, buffer, bufferSize);
+        }
+        return buffer;
+    }
+    internal static unsafe byte* Utf8EncodeNullable(string str, byte* buffer, int bufferSize)
+    {
+        if (str == null)
+        {
+            return (byte*)0;
+        }
+        fixed (char* strPtr = str)
+        {
+            Encoding.UTF8.GetBytes(strPtr, str.Length + 1, buffer, bufferSize);
+        }
+        return buffer;
+    }
+
+    /* Used for heap allocated string marshaling.
+     * Returned byte* must be free'd with FreeHGlobal.
+     */
+    internal static unsafe byte* Utf8Encode(string str)
+    {
+        Debug.Assert(str != null);
+        int bufferSize = Utf8Size(str);
+        byte* buffer = (byte*)Marshal.AllocHGlobal(bufferSize);
+        fixed (char* strPtr = str)
+        {
+            Encoding.UTF8.GetBytes(strPtr, str.Length + 1, buffer, bufferSize);
+        }
+        return buffer;
+    }
+
+    /* This is public because SDL_DropEvent needs it! */
+    public static unsafe string UTF8_ToManaged(IntPtr s, bool freePtr = false)
+    {
+        if (s == IntPtr.Zero)
+        {
+            return null;
+        }
+
+        /* We get to do strlen ourselves! */
+        byte* ptr = (byte*)s;
+        while (*ptr != 0)
+        {
+            ptr++;
+        }
+
+        /* TODO: This #ifdef is only here because the equivalent
+         * .NET 2.0 constructor appears to be less efficient?
+         * Here's the pretty version, maybe steal this instead:
+         *
+        string result = new string(
+            (sbyte*) s, // Also, why sbyte???
+            0,
+            (int) (ptr - (byte*) s),
+            System.Text.Encoding.UTF8
+        );
+         * See the CoreCLR source for more info.
+         * -flibit
+         */
+#if NETSTANDARD2_0
+        /* Modern C# lets you just send the byte*, nice! */
+        string result = System.Text.Encoding.UTF8.GetString(
+            (byte*)s,
+            (int)(ptr - (byte*)s)
+        );
+#else
+			/* Old C# requires an extra memcpy, bleh! */
+			int len = (int) (ptr - (byte*) s);
+			if (len == 0)
+			{
+				return string.Empty;
+			}
+			char* chars = stackalloc char[len];
+			int strLen = System.Text.Encoding.UTF8.GetChars((byte*) s, len, chars, len);
+			string result = new string(chars, 0, strLen);
+#endif
+
+        /* Some SDL functions will malloc, we have to free! */
+        if (freePtr)
+        {
+            free(s);
+        }
+        return result;
+    }
+
+    #endregion
+
+    /* malloc/free are used by the marshaler! -flibit */
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void d_sdl_malloc(IntPtr size);
+    public static d_sdl_malloc malloc = FuncLoader.LoadFunction<d_sdl_malloc>(NativeLibrary, "SDL_malloc");
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void d_sdl_free(IntPtr memblock);
+    public static d_sdl_free free = FuncLoader.LoadFunction<d_sdl_free>(NativeLibrary, "SDL_free");
+
+    /* Buffer.BlockCopy is not available in every runtime yet. Also,
+     * using memcpy directly can be a compatibility issue in other
+     * strange ways. So, we expose this to get around all that.
+     * -flibit
+     */
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate IntPtr d_sdl_memcpy(IntPtr dst, IntPtr src, IntPtr len);
+    public static d_sdl_memcpy memcpy = FuncLoader.LoadFunction<d_sdl_memcpy>(NativeLibrary, "SDL_memcpy");
+
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate int d_sdl_init(int flags);
     public static d_sdl_init SDL_Init = FuncLoader.LoadFunction<d_sdl_init>(NativeLibrary, "SDL_Init");
@@ -249,6 +373,15 @@ internal static class Sdl
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate int d_sdl_sethint(string name, string value);
     public static d_sdl_sethint SetHint = FuncLoader.LoadFunction<d_sdl_sethint>(NativeLibrary, "SDL_SetHint");
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate IntPtr d_sdl_getplatform();
+    private static d_sdl_getplatform SDL_GetPlatform = FuncLoader.LoadFunction<d_sdl_getplatform>(NativeLibrary, "SDL_GetPlatform");
+
+    public static string GetPlatform()
+    {
+        return UTF8_ToManaged(SDL_GetPlatform());
+    }
 
     public static class Window
     {
@@ -409,6 +542,10 @@ internal static class Sdl
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void d_sdl_showwindow(IntPtr window);
         public static d_sdl_showwindow Show = FuncLoader.LoadFunction<d_sdl_showwindow>(NativeLibrary, "SDL_ShowWindow");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void d_sdl_hidewindow(IntPtr window);
+        public static d_sdl_hidewindow Hide = FuncLoader.LoadFunction<d_sdl_hidewindow>(NativeLibrary, "SDL_HideWindow");
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate bool d_sdl_getwindowwminfo(IntPtr window, ref SDL_SysWMinfo sysWMinfo);
@@ -684,6 +821,10 @@ internal static class Sdl
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void d_sdl_warpmouseinwindow(IntPtr window, int x, int y);
         public static d_sdl_warpmouseinwindow WarpInWindow = FuncLoader.LoadFunction<d_sdl_warpmouseinwindow>(NativeLibrary, "SDL_WarpMouseInWindow");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate IntPtr d_sdl_getmousefocus();
+        public static d_sdl_getmousefocus GetMouseFocus = FuncLoader.LoadFunction<d_sdl_getmousefocus>(NativeLibrary, "SDL_GetMouseFocus");
     }
 
     public static class Keyboard
@@ -1104,6 +1245,41 @@ internal static class Sdl
         public static void UpdateEffect(IntPtr haptic, int effect, ref Effect data)
         {
             GetError(SDL_HapticUpdateEffect(haptic, effect, ref data));
+        }
+    }
+    public static class MessageBox
+    {
+        [Flags]
+        public enum Flags : uint
+        {
+            ERROR = 0x00000010,
+            WARNING = 0x00000020,
+            INFORMATION = 0x00000040
+        }
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private unsafe delegate int d_sdl_showsimplemessagebox(Flags flags, byte* title, byte* message, IntPtr window);
+        private static d_sdl_showsimplemessagebox SDL_ShowSimpleMessageBox = FuncLoader.LoadFunction<d_sdl_showsimplemessagebox>(NativeLibrary, "SDL_ShowSimpleMessageBox");
+
+        public static unsafe int ShowSimple(
+            Flags flags,
+            string title,
+            string message,
+            IntPtr window
+        )
+        {
+            int utf8TitleBufSize = Utf8SizeNullable(title);
+            byte* utf8Title = stackalloc byte[utf8TitleBufSize];
+
+            int utf8MessageBufSize = Utf8SizeNullable(message);
+            byte* utf8Message = stackalloc byte[utf8MessageBufSize];
+
+            return SDL_ShowSimpleMessageBox(
+                flags,
+                Utf8EncodeNullable(title, utf8Title, utf8TitleBufSize),
+                Utf8EncodeNullable(message, utf8Message, utf8MessageBufSize),
+                window
+            );
         }
     }
 }

@@ -15,6 +15,7 @@ namespace Microsoft.Xna.Framework
 #if XNADESIGNPROVIDED
     [System.ComponentModel.TypeConverter(typeof(Microsoft.Xna.Framework.Design.Vector2TypeConverter))]
 #endif
+    [Serializable]
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct Vector2 : IEquatable<Vector2>

@@ -64,8 +64,10 @@ namespace Microsoft.Xna.Framework.Media
 
             set
             {
+#if IOS || ANDROID
                 PlatformSetVolume(value);
                 _volume = value;
+#endif
             }
         }
 

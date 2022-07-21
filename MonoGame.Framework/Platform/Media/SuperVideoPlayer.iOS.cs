@@ -88,11 +88,17 @@ namespace Microsoft.Xna.Framework.Media
                     Marshal.Copy(pixelBufferPtr, _buffer, 0, bufferWidth * bufferHeight * 4);
                     _lastTexture.SetData(_buffer);
 
+                    RenderTargetBinding[] previousBindings = Game.Instance.GraphicsDevice.GetRenderTargets();
+                    Viewport previousViewport = Game.Instance.GraphicsDevice.Viewport;
+
+                    Game.Instance.GraphicsDevice.Viewport = new Viewport(0, 0, _processedTexture.Width, _processedTexture.Height);
                     Game.Instance.GraphicsDevice.SetRenderTarget(_processedTexture);
                     _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, effect: _swipeRBEffect);
-                    _spriteBatch.Draw(_lastTexture, new Rectangle(0, 0, _lastTexture.Width, _lastTexture.Height), Color.White);
+                    _spriteBatch.Draw(_lastTexture, new Rectangle(0, 0, _processedTexture.Width, _processedTexture.Height), Color.White);
                     _spriteBatch.End();
-                    Game.Instance.GraphicsDevice.SetRenderTarget(null);
+
+                    Game.Instance.GraphicsDevice.SetRenderTargets(previousBindings);
+                    Game.Instance.GraphicsDevice.Viewport = previousViewport;
                 }
             }
 

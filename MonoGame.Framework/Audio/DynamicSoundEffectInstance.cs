@@ -142,7 +142,9 @@ namespace Microsoft.Xna.Framework.Audio
                 PlatformPlay();
                 _state = SoundState.Playing;
 
-                CheckBufferCount();
+                // Prime initial number of buffers to enqueue
+                _buffersNeeded = TargetPendingBufferCount;
+
                 DynamicSoundEffectInstanceManager.AddInstance(this);
             }
         }

@@ -11,6 +11,7 @@ namespace Microsoft.Xna.Framework.Media
         private bool disposed = false;
         private bool prepared = false;
         private bool surfaceTextureFrameAvailable = false;
+        private bool gotFirstFrame = false;
 
         private Android.Graphics.SurfaceTexture surfaceTexture = null;
         private Android.Views.Surface surface = null;
@@ -35,6 +36,7 @@ namespace Microsoft.Xna.Framework.Media
             spriteOESBatch = new SpriteOESBatch(graphicsDevice);
 
             // Set up surface
+            gotFirstFrame = false;
             surfaceTextureFrameAvailable = false;
             surfaceTexture = new Android.Graphics.SurfaceTexture(oesTexture.glTexture);
             surfaceTexture.FrameAvailable += SurfaceTexture_FrameAvailable;
@@ -69,6 +71,8 @@ namespace Microsoft.Xna.Framework.Media
             player.Start();
         }
 
+        /// Returns a texture of the current frame, if available.
+        /// May return null if the first frame hasn't been decoded yet.
         private Texture2D PlatformGetTexture()
         {
             if (surfaceTextureFrameAvailable)
@@ -89,11 +93,12 @@ namespace Microsoft.Xna.Framework.Media
 
                 graphicsDevice.SetRenderTargets(previousBindings);
                 graphicsDevice.Viewport = previousViewport;
-            }
 
-            if (texture == null)
+                gotFirstFrame = true;
+            }
+            else if (!gotFirstFrame)
             {
-                texture = new RenderTarget2D(graphicsDevice, 1, 1, false, SurfaceFormat.Color, DepthFormat.None);
+                return null;
             }
 
             return texture;
@@ -104,17 +109,19 @@ namespace Microsoft.Xna.Framework.Media
             // Force stopped state when duration is full
             if (player == null)
             {
-                return;
+                result = MediaState.Stopped;
             }
-
-            if (PlayPosition == TimeSpan.Zero && Duration == TimeSpan.Zero)
-            {
-                return;
-            }
-
-            if (PlayPosition >= Duration)
+            else if (PlayPosition == TimeSpan.Zero && Duration == TimeSpan.Zero)
             {
                 result = MediaState.Stopped;
+            }
+            else if (PlayPosition >= Duration)
+            {
+                result = MediaState.Stopped;
+            }
+            else
+            {
+                result = MediaState.Playing;
             }
         }
 

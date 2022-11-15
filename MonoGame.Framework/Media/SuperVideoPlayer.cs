@@ -106,19 +106,13 @@ namespace Microsoft.Xna.Framework.Media
 #endif
         }
 
+        // May return null if the first frame hasn't been decoded yet.
         public Texture2D GetTexture()
         {
 #if !IOS && !ANDROID
             throw new NotImplementedException();
 #else
-            Texture2D texture = PlatformGetTexture();
-
-            if (texture == null)
-            {
-                throw new InvalidOperationException("Platform returned a null texture");
-            }
-
-            return texture;
+            return PlatformGetTexture();
 #endif
         }
 

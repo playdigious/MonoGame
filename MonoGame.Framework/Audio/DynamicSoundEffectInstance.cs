@@ -94,6 +94,9 @@ namespace Microsoft.Xna.Framework.Audio
             // and it contributes to the playing instances limit, but the source/voice is not owned by the pool.
             _isPooled = false;
             _isDynamic = true;
+
+            // Force pitch on OpenAL source to prevent inheriting residual pitch from an old effect
+            this.Pitch = 0;
         }
 
         #endregion

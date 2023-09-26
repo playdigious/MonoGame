@@ -631,6 +631,10 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        public void ProcessThreadingBlockedActions()
+        {
+            Threading.Run();
+        }
         #endregion
 
         #region Protected Methods

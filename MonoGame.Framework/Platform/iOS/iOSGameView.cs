@@ -298,8 +298,8 @@ namespace Microsoft.Xna.Framework {
 				gds.GraphicsDevice.glFramebuffer = _framebuffer;
 			}
 
-            if (Threading.BackgroundContext == null)
-                Threading.BackgroundContext = new OpenGLES.EAGLContext(ctx.Context.API, ctx.Context.ShareGroup);
+            //if (Threading.BackgroundContext == null)
+            //    Threading.BackgroundContext = new OpenGLES.EAGLContext(ctx.Context.API, ctx.Context.ShareGroup);
 		}
 
 		private void DestroyFramebuffer ()

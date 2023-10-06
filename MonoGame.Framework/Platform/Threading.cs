@@ -55,7 +55,7 @@ namespace Microsoft.Xna.Framework
         }
 
 #if IOS
-        public static EAGLContext BackgroundContext;
+        //public static EAGLContext BackgroundContext;
 #endif
 
         static Threading()
@@ -179,11 +179,12 @@ namespace Microsoft.Xna.Framework
             EnsureUIThread();
 
 #if IOS
-            lock (BackgroundContext)
-            {
-                // Make the context current on this thread if it is not already
-                if (!Object.ReferenceEquals(EAGLContext.CurrentContext, BackgroundContext))
-                    EAGLContext.SetCurrentContext(BackgroundContext);
+            //lock (BackgroundContext)
+            //{
+            //    // Make the context current on this thread if it is not already
+            //    if (!Object.ReferenceEquals(EAGLContext.CurrentContext, BackgroundContext))
+            //        EAGLContext.SetCurrentContext(BackgroundContext);
+                ((iOSGameWindow)Game.Instance.Window).ViewController.View.MakeCurrent();
 #endif
 
 #if ANDROID
@@ -201,10 +202,10 @@ namespace Microsoft.Xna.Framework
             }
 
 #if IOS
-                // Must flush the GL calls so the GPU asset is ready for the main context to use it
-                GL.Flush();
-                GraphicsExtensions.CheckGLError();
-            }
+            //    // Must flush the GL calls so the GPU asset is ready for the main context to use it
+            //    GL.Flush();
+            //    GraphicsExtensions.CheckGLError();
+            //}
 #endif
         }
     }

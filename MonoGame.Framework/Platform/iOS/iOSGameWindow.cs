@@ -72,14 +72,14 @@ using UIKit;
 
 namespace Microsoft.Xna.Framework {
 	class iOSGameWindow : GameWindow {
-		private readonly iOSGameViewController _viewController;
+		internal iOSGameViewController ViewController { get; private set; }
 
-		public iOSGameWindow (iOSGameViewController viewController)
+        public iOSGameWindow (iOSGameViewController viewController)
 		{
 			if (viewController == null)
 				throw new ArgumentNullException("viewController");
-			_viewController = viewController;
-            _viewController.InterfaceOrientationChanged += HandleInterfaceOrientationChanged;
+            ViewController = viewController;
+            ViewController.InterfaceOrientationChanged += HandleInterfaceOrientationChanged;
 		}
 
         void HandleInterfaceOrientationChanged (object sender, EventArgs e)
@@ -96,11 +96,11 @@ namespace Microsoft.Xna.Framework {
 
 		public override Rectangle ClientBounds {
 			get {
-				var bounds = _viewController.View.Bounds;
-                var scale = _viewController.View.ContentScaleFactor;
+				var bounds = ViewController.View.Bounds;
+                var scale = ViewController.View.ContentScaleFactor;
 
                 // TODO: Calculate this only when dirty.
-                if (_viewController is iOSGameViewController)
+                if (ViewController is iOSGameViewController)
                 {
 
                     var currentOrientation = CurrentOrientation;
@@ -138,7 +138,7 @@ namespace Microsoft.Xna.Framework {
                 #if TVOS
                 return DisplayOrientation.LandscapeLeft;
                 #else
-				return OrientationConverter.ToDisplayOrientation(_viewController.InterfaceOrientation);
+				return OrientationConverter.ToDisplayOrientation(ViewController.InterfaceOrientation);
                 #endif
 			}
 		}
@@ -147,13 +147,13 @@ namespace Microsoft.Xna.Framework {
 			get {
 				// TODO: Verify that View.Handle is a sensible
 				//       value to return here.
-				return _viewController.View.Handle;
+				return ViewController.View.Handle;
 			}
 		}
 
 		public override string ScreenDeviceName {
 			get {
-				var screen = _viewController.View.Window.Screen;
+				var screen = ViewController.View.Window.Screen;
 				if (screen == UIScreen.MainScreen)
 					return "Main Display";
 				else
@@ -174,12 +174,12 @@ namespace Microsoft.Xna.Framework {
 
 		internal protected override void SetSupportedOrientations (DisplayOrientation orientations)
 		{
-			_viewController.SupportedOrientations = orientations;
+            ViewController.SupportedOrientations = orientations;
 		}
 
 		protected override void SetTitle (string title)
 		{
-			_viewController.Title = title;
+            ViewController.Title = title;
 		}
 
 		#endregion GameWindow Members

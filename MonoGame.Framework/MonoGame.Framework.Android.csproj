@@ -14,7 +14,7 @@
     <PlatformTarget>ARM64</PlatformTarget>
     <Platforms>ARM64</Platforms>
 	<RuntimeIdentifier>android-arm64</RuntimeIdentifier>
-	<Configurations>Debug;Release;DebugPlaydi;ReleasePlaydi</Configurations>
+	<Configurations>Debug;Release;DebugPlaydi;ReleasePlaydi;ProfilePlaydi</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

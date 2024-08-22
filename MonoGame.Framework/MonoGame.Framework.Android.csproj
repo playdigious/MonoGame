@@ -9,6 +9,7 @@
     <PackageTags>monogame;.net core;core;.net standard;standard;android</PackageTags>
     <PackageId>MonoGame.Framework.Android</PackageId>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <AndroidUseDesignerAssembly>false</AndroidUseDesignerAssembly>
     <SupportedOSPlatformVersion>26.0</SupportedOSPlatformVersion>
     <PlatformTarget>ARM64</PlatformTarget>
     <Platforms>ARM64</Platforms>

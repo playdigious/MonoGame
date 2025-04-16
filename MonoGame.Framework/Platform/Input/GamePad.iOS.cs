@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -17,22 +17,22 @@ namespace Microsoft.Xna.Framework.Input
         static bool IndexIsUsed(GCControllerPlayerIndex index)
         {
             foreach (var ctrl in GCController.Controllers)
-                if (ctrl.PlayerIndex == (int)index) return true;
+                if (ctrl.PlayerIndex == index) return true;
 
             return false;
         }
 
-        static void AssingIndex(GCControllerPlayerIndex index)
+        static void AssignIndex(GCControllerPlayerIndex index)
         {
             if (IndexIsUsed(index))
                 return;
             foreach (var controller in GCController.Controllers)
             {
-                if (controller.PlayerIndex == (int)index)
+                if (controller.PlayerIndex == index)
                     break;
-                if (controller.PlayerIndex == (int)GCControllerPlayerIndex.Unset)
+                if (controller.PlayerIndex == GCControllerPlayerIndex.Unset)
                 {
-                    controller.PlayerIndex = (int)index;
+                    controller.PlayerIndex = index;
                     break;
                 }
             }
@@ -42,13 +42,13 @@ namespace Microsoft.Xna.Framework.Input
         {
             var ind = (GCControllerPlayerIndex)index;
 
-            AssingIndex(ind);
+            AssignIndex(ind);
 
             foreach (var controller in GCController.Controllers)
             {
                 if (controller == null)
                     continue;
-                if (controller.PlayerIndex == (int)ind)
+                if (controller.PlayerIndex == ind)
                     return GetCapabilities(controller);
             }
             return new GamePadCapabilities { IsConnected = false };
@@ -69,6 +69,7 @@ namespace Microsoft.Xna.Framework.Input
                 capabilities.HasXButton = true;
                 capabilities.HasYButton = true;
                 capabilities.HasBackButton = true;
+                capabilities.HasStartButton = true;
                 capabilities.HasDPadUpButton = true;
                 capabilities.HasDPadDownButton = true;
                 capabilities.HasDPadLeftButton = true;
@@ -88,7 +89,6 @@ namespace Microsoft.Xna.Framework.Input
                 capabilities.HasBButton = true;
                 capabilities.HasXButton = true;
                 capabilities.HasYButton = true;
-                capabilities.HasBackButton = true;
                 capabilities.HasDPadUpButton = true;
                 capabilities.HasDPadDownButton = true;
                 capabilities.HasDPadLeftButton = true;
@@ -117,7 +117,7 @@ namespace Microsoft.Xna.Framework.Input
             float leftTriggerValue = 0;
             float rightTriggerValue = 0;
 
-            AssingIndex(ind);
+            AssignIndex(ind);
 
             foreach (var controller in GCController.Controllers)
             {
@@ -125,7 +125,7 @@ namespace Microsoft.Xna.Framework.Input
                 if (controller == null)
                     continue;
 
-                if (controller.PlayerIndex != (int)ind)
+                if (controller.PlayerIndex != ind)
                     continue;
 
                 connected = true;
@@ -154,6 +154,17 @@ namespace Microsoft.Xna.Framework.Input
                     if (controller.ExtendedGamepad.RightTrigger.IsPressed)
                         buttons |= Buttons.RightTrigger;
 
+                    if (controller.ExtendedGamepad.ButtonMenu != null
+                    && controller.ExtendedGamepad.ButtonMenu.IsPressed)
+                    {
+                        buttons |= Buttons.Start;
+                    }
+                        
+                    if (controller.ExtendedGamepad.ButtonOptions?.IsPressed == true)
+                    {
+                        buttons |= Buttons.Back;
+                    }
+
                     if (controller.ExtendedGamepad.DPad.Up.IsPressed)
                     {
                         Up = ButtonState.Pressed;
@@ -173,6 +184,18 @@ namespace Microsoft.Xna.Framework.Input
                     {
                         Right = ButtonState.Pressed;
                         buttons |= Buttons.DPadRight;
+                    }
+
+                    if (controller.ExtendedGamepad.LeftThumbstickButton != null
+                    && controller.ExtendedGamepad.LeftThumbstickButton.IsPressed)
+                    {
+                        buttons |= Buttons.LeftStick;
+                    }
+
+                    if (controller.ExtendedGamepad.RightThumbstickButton != null
+                    && controller.ExtendedGamepad.RightThumbstickButton.IsPressed)
+                    {
+                        buttons |= Buttons.RightStick;
                     }
 
                     leftThumbStickPosition.X = controller.ExtendedGamepad.LeftThumbstick.XAxis.Value;

@@ -1,8 +1,9 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,6 +14,7 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Tests.Components;
 using MonoGame.Tests.Utilities;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 
 namespace MonoGame.Tests.Graphics
 {
@@ -162,7 +164,7 @@ namespace MonoGame.Tests.Graphics
             var referenceImageDirectory = Paths.ReferenceImage(folderName);
             var outputDirectory = Paths.CapturedFrame(folderName);
             var fileName = TestContext.CurrentContext.GetTestFrameFileNameFormat(_totalFramesExpected);
-            var capturedImagePath = Path.Combine(outputDirectory, fileName);
+            var capturedImagePath = Path.Combine(TestContext.CurrentContext.TestDirectory, outputDirectory, fileName);
             var referenceImagePath = Path.Combine(referenceImageDirectory, fileName);
             
             var allResults = new List<FrameComparisonResult>();
@@ -183,7 +185,7 @@ namespace MonoGame.Tests.Graphics
                     {
                         Directory.CreateDirectory(outputDirectory);
                         _writerThread.AddAction(() =>
-                            frame.Save(capturedPath));
+                            frame.Save(capturedPath, "Capture"));
                     }
                     noReference.Add(referencePath);
                     continue;
@@ -209,7 +211,7 @@ namespace MonoGame.Tests.Graphics
                 {
                     Directory.CreateDirectory(outputDirectory);
                     _writerThread.AddAction(() =>
-                        result.CapturedData.Save(result.CapturedImagePath));
+                        result.CapturedData.Save(result.CapturedImagePath, "Capture"));
                 }
 
                 if (result.SaveDiff)
@@ -314,7 +316,7 @@ namespace MonoGame.Tests.Graphics
         {
             var diff = CreateDiff(capture, reference);
             Normalize(diff);
-            diff.Save(outputPath);
+            diff.Save(outputPath, "Diff");
         }
         
         private static FramePixelData CreateDiff (FramePixelData a, FramePixelData b)

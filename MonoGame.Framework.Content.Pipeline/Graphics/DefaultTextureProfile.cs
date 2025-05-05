@@ -130,9 +130,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     GraphicsUtil.CompressAti(context, content, isSpriteFont);
                     break;
 
-                case TextureProcessorOutputFormat.AstcCompressed:
+                // Comment to keep Antonin implementsations
+                /*case TextureProcessorOutputFormat.AstcCompressed:
                     GraphicsUtil.CompressAstc(context, content, isSpriteFont);
-                    break;
+                    break;*/
 
                 case TextureProcessorOutputFormat.Color16Bit:
                     GraphicsUtil.CompressColor16Bit(context, content);
@@ -156,7 +157,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     GraphicsUtil.CompressPvrtc(context, content, isSpriteFont);
                     break;
                 case TextureProcessorOutputFormat.AstcCompressed:
-                    //Not supported 
+                    //Not supported
                     break;
             }
         }

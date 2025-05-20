@@ -95,3 +95,7 @@ vsxmake2022
 
 # docfx
 _*
+
+# Street of Rage 4
+.bin.Android*
+.bin.iOS*

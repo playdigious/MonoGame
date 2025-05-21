@@ -11,26 +11,26 @@ namespace Microsoft.Xna.Framework.Graphics
     /// <summary>
     /// Helper class for drawing eos sprites in one or more optimized batches.
     /// </summary>
-	public class SpriteEOSBatch : SpriteBatch
+	public class SpriteOESBatch : SpriteBatch
 	{
         /// <summary>
-        /// Constructs a <see cref="SpriteBatch"/>.
+        /// Constructs a <see cref="SpriteOESBatch"/>.
         /// </summary>
-        /// <param name="graphicsDevice">The <see cref="GraphicsDevice"/>, which will be used for sprite rendering.</param>        
+        /// <param name="graphicsDevice">The <see cref="GraphicsDevice"/>, which will be used for oes texture rendering.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="graphicsDevice"/> is null.</exception>
-        public SpriteEOSBatch(GraphicsDevice graphicsDevice) : this(graphicsDevice, 0)
-        {            
+        public SpriteOESBatch(GraphicsDevice graphicsDevice) : this(graphicsDevice, 0)
+        {
         }
 
         /// <summary>
         /// Constructs a <see cref="SpriteBatch"/>.
         /// </summary>
-        /// <param name="graphicsDevice">The <see cref="GraphicsDevice"/>, which will be used for sprite rendering.</param>
+        /// <param name="graphicsDevice">The <see cref="GraphicsDevice"/>, which will be used for oes texture rendering.</param>
         /// <param name="capacity">The initial capacity of the internal array holding batch items (the value will be rounded to the next multiple of 64).</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="graphicsDevice"/> is null.</exception>
-        public SpriteEOSBatch(GraphicsDevice graphicsDevice, int capacity) : base (graphicsDevice, capacity)
+        public SpriteOESBatch(GraphicsDevice graphicsDevice, int capacity) : base (graphicsDevice, capacity)
 		{
-            _spriteEffect = new SpriteEOSEffect(graphicsDevice);
+            _spriteEffect = new SpriteOESEffect(graphicsDevice);
 		}
 	}
 }

@@ -26,9 +26,9 @@ using Android.Graphics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public partial class TextureEOS2D : Texture2D
+    public partial class TextureOES2D : Texture2D
     {
-        public TextureEOS2D(GraphicsDevice graphicsDevice) : base(graphicsDevice, 1, 1, false, SurfaceFormat.Color, SurfaceType.TextureExternalOES, false, 1)
+        public TextureOES2D(GraphicsDevice graphicsDevice) : base(graphicsDevice, 1, 1, false, SurfaceFormat.Color, SurfaceType.TextureExternalOES, false, 1)
         {
 
         }

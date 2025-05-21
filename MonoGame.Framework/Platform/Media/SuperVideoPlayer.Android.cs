@@ -14,7 +14,7 @@ namespace Microsoft.Xna.Framework.Media
 
         private Android.Graphics.SurfaceTexture surfaceTexture = null;
         private Android.Views.Surface surface = null;
-        private TextureEOS2D eosTexture = null;
+        private TextureOES2D oesTexture = null;
         private int currentPosition = 0;
 
         private Android.Media.MediaPlayer player;
@@ -27,11 +27,11 @@ namespace Microsoft.Xna.Framework.Media
             currentPosition = 0;
 
             // Set up eos texture
-            eosTexture = new TextureEOS2D(graphicsDevice);
+            oesTexture = new TextureOES2D(graphicsDevice);
 
             // Set up surface
             surfaceTextureFrameAvailable = false;
-            surfaceTexture = new Android.Graphics.SurfaceTexture(eosTexture.glTexture);
+            surfaceTexture = new Android.Graphics.SurfaceTexture(oesTexture.glTexture);
             surfaceTexture.FrameAvailable += SurfaceTexture_FrameAvailable;
             surface = new Android.Views.Surface(surfaceTexture);
             player.SetSurface(surface);
@@ -46,8 +46,8 @@ namespace Microsoft.Xna.Framework.Media
             prepared = true;
 
             // Update eos size
-            eosTexture.Width = player.VideoWidth;
-            eosTexture.Height = player.VideoHeight;
+            oesTexture.Width = player.VideoWidth;
+            oesTexture.Height = player.VideoHeight;
 
             player.Start();
         }
@@ -62,9 +62,9 @@ namespace Microsoft.Xna.Framework.Media
                 surfaceTextureFrameAvailable = false;
             }
 
-            return eosTexture;
+            return oesTexture;
         }
-        
+
         private void PlatformGetState(ref MediaState result)
         {
         }
@@ -151,10 +151,10 @@ namespace Microsoft.Xna.Framework.Media
                 player = null;
             }
 
-            if (eosTexture != null)
+            if (oesTexture != null)
             {
-                eosTexture.Dispose();
-                eosTexture = null;
+                oesTexture.Dispose();
+                oesTexture = null;
             }
 
             if (surfaceTexture != null)

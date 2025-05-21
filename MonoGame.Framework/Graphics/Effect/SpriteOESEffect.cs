@@ -11,12 +11,12 @@ namespace Microsoft.Xna.Framework.Graphics
     /// <summary>
     /// The default effect used by SpriteEOSBatch.
     /// </summary>
-    public class SpriteEOSEffect : SpriteEffect
+    public class SpriteOESEffect : SpriteEffect
     {
         /// <summary>
         /// Creates a new SpriteEOSEffect.
         /// </summary>
-        public SpriteEOSEffect(GraphicsDevice device)
+        public SpriteOESEffect(GraphicsDevice device)
             : base(device, EffectResource.SpriteEOSEffect.Bytecode)
         {
         }

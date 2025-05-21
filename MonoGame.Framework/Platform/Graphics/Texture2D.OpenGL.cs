@@ -161,6 +161,11 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformSetDataBody<T>(int level, int arraySlice, Rectangle rect, T[] data, int startIndex, int elementCount)
             where T : struct
         {
+            if (this.glTarget == TextureTarget.TextureExternalOES)
+            {
+                throw new NotSupportedException("Texture external eos can't be set.");
+            }
+
             var elementSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
             var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
             // Use try..finally to make sure dataHandle is freed in case of an error
@@ -216,6 +221,11 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformSetData<T>(int level, T[] data, int startIndex, int elementCount)
             where T : struct
         {
+            if (this.glTarget == TextureTarget.TextureExternalOES)
+            {
+                throw new NotSupportedException("Texture external eos can't be set.");
+            }
+
             Threading.BlockOnUIThread(SetDataState<T>.Action, new SetDataState<T>
             {
                 texture = this,

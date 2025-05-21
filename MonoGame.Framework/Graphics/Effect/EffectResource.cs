@@ -19,7 +19,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public static readonly EffectResource SkinnedEffect = new EffectResource(SkinnedEffectName);
         public static readonly EffectResource SpriteEffect = new EffectResource(SpriteEffectName);
 #if OPENGL
-        public static readonly EffectResource SpriteEOSEffect = new EffectResource(SpriteEOSEffectName);
+        public static readonly EffectResource SpriteOESEffect = new EffectResource(SpriteOESEffectName);
 #endif
 
         private readonly object _locker = new object();
@@ -52,7 +52,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if !NATIVE
         private static byte[] PlatformGetBytecode(string name)
-        {            
+        {
             var assembly = ReflectionHelpers.GetAssembly(typeof(EffectResource));
 
             var stream = assembly.GetManifestResourceStream(name);

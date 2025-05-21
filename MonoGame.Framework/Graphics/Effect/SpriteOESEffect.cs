@@ -9,15 +9,15 @@
 namespace Microsoft.Xna.Framework.Graphics
 {
     /// <summary>
-    /// The default effect used by SpriteEOSBatch.
+    /// The default effect used by SpriteOESBatch.
     /// </summary>
     public class SpriteOESEffect : SpriteEffect
     {
         /// <summary>
-        /// Creates a new SpriteEOSEffect.
+        /// Creates a new SpriteOESEffect.
         /// </summary>
         public SpriteOESEffect(GraphicsDevice device)
-            : base(device, EffectResource.SpriteEOSEffect.Bytecode)
+            : base(device, EffectResource.SpriteOESEffect.Bytecode)
         {
         }
     }

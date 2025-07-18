@@ -3,6 +3,7 @@
   <Import Project="..\MonoGame.props" />
 
   <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <BaseOutputPath>..\Artifacts\MonoGame.Framework.Content.Pipeline</BaseOutputPath>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Description>The Monogame Content Pipeline for Windows, Mac and Linux is used to compile raw content to xnb files.</Description>
@@ -10,6 +11,7 @@
     <PackageId>MonoGame.Framework.Content.Pipeline</PackageId>
     <AssemblyName>MonoGame.Framework.Content.Pipeline</AssemblyName>
     <RootNamespace>Microsoft.Xna.Framework.Content.Pipeline</RootNamespace>
+    <CopyContentFiles>True</CopyContentFiles>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <DefineConstants>STBSHARP_INTERNAL</DefineConstants>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

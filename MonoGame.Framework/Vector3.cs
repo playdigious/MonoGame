@@ -202,9 +202,9 @@ namespace Microsoft.Xna.Framework
             this.Y = value.Y;
             this.Z = z;
         }
-        
+
         #endregion
-        
+
         #region Public Methods
 
         /// <summary>
@@ -215,10 +215,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>The result of the vector addition.</returns>
         public static Vector3 Add(Vector3 value1, Vector3 value2)
         {
-            value1.X += value2.X;
-            value1.Y += value2.Y;
-            value1.Z += value2.Z;
-            return value1;
+            Vector3 result;
+            result.X = value1.X + value2.X;
+            result.Y = value1.Y + value2.Y;
+            result.Z = value1.Z + value2.Z;
+            return result;
         }
 
         /// <summary>
@@ -319,10 +320,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>The rounded <see cref="Vector3"/>.</returns>
         public static Vector3 Ceiling(Vector3 value)
         {
-            value.X = MathF.Ceiling(value.X);
-            value.Y = MathF.Ceiling(value.Y);
-            value.Z = MathF.Ceiling(value.Z);
-            return value;
+            Vector3 result;
+            result.X = MathF.Ceiling(value.X);
+            result.Y = MathF.Ceiling(value.Y);
+            result.Z = MathF.Ceiling(value.Z);
+            return result;
         }
 
         /// <summary>
@@ -374,8 +376,9 @@ namespace Microsoft.Xna.Framework
         /// <returns>The cross product of two vectors.</returns>
         public static Vector3 Cross(Vector3 vector1, Vector3 vector2)
         {
-            Cross(ref vector1, ref vector2, out vector1);
-            return vector1;
+            Vector3 result;
+            Cross(ref vector1, ref vector2, out result);
+            return result;
         }
 
         /// <summary>
@@ -453,10 +456,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>The result of dividing the vectors.</returns>
         public static Vector3 Divide(Vector3 value1, Vector3 value2)
         {
-            value1.X /= value2.X;
-            value1.Y /= value2.Y;
-            value1.Z /= value2.Z;
-            return value1;
+            Vector3 result;
+            result.X = value1.X / value2.X;
+            result.Y = value1.Y / value2.Y;
+            result.Z = value1.Z / value2.Z;
+            return result;
         }
 
         /// <summary>
@@ -467,11 +471,12 @@ namespace Microsoft.Xna.Framework
         /// <returns>The result of dividing a vector by a scalar.</returns>
         public static Vector3 Divide(Vector3 value1, float divider)
         {
+            Vector3 result;
             float factor = 1 / divider;
-            value1.X *= factor;
-            value1.Y *= factor;
-            value1.Z *= factor;
-            return value1;
+            result.X = value1.X * factor;
+            result.Y = value1.Y * factor;
+            result.Z = value1.Z * factor;
+            return result;
         }
 
         /// <summary>
@@ -546,7 +551,7 @@ namespace Microsoft.Xna.Framework
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
         public bool Equals(Vector3 other)
         {
-            return  X == other.X && 
+            return  X == other.X &&
                     Y == other.Y &&
                     Z == other.Z;
         }
@@ -568,10 +573,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>The rounded <see cref="Vector3"/>.</returns>
         public static Vector3 Floor(Vector3 value)
         {
-            value.X = MathF.Floor(value.X);
-            value.Y = MathF.Floor(value.Y);
-            value.Z = MathF.Floor(value.Z);
-            return value;
+            Vector3 result;
+            result.X = MathF.Floor(value.X);
+            result.Y = MathF.Floor(value.Y);
+            result.Z = MathF.Floor(value.Z);
+            return result;
         }
 
         /// <summary>
@@ -776,10 +782,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>The result of the vector multiplication.</returns>
         public static Vector3 Multiply(Vector3 value1, Vector3 value2)
         {
-            value1.X *= value2.X;
-            value1.Y *= value2.Y;
-            value1.Z *= value2.Z;
-            return value1;
+            Vector3 result;
+            result.X = value1.X * value2.X;
+            result.Y = value1.Y * value2.Y;
+            result.Z = value1.Z * value2.Z;
+            return result;
         }
 
         /// <summary>
@@ -790,10 +797,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>The result of the vector multiplication with a scalar.</returns>
         public static Vector3 Multiply(Vector3 value1, float scaleFactor)
         {
-            value1.X *= scaleFactor;
-            value1.Y *= scaleFactor;
-            value1.Z *= scaleFactor;
-            return value1;
+            Vector3 result;
+            result.X = value1.X * scaleFactor;
+            result.Y = value1.Y * scaleFactor;
+            result.Z = value1.Z * scaleFactor;
+            return result;
         }
 
         /// <summary>
@@ -829,8 +837,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>The result of the vector inversion.</returns>
         public static Vector3 Negate(Vector3 value)
         {
-            value = new Vector3(-value.X, -value.Y, -value.Z);
-            return value;
+            Vector3 result;
+            result.X = -value.X;
+            result.Y = -value.Y;
+            result.Z = -value.Z;
+            return result;
         }
 
         /// <summary>
@@ -940,10 +951,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>The rounded <see cref="Vector3"/>.</returns>
         public static Vector3 Round(Vector3 value)
         {
-            value.X = MathF.Round(value.X);
-            value.Y = MathF.Round(value.Y);
-            value.Z = MathF.Round(value.Z);
-            return value;
+            Vector3 result;
+            result.X = MathF.Round(value.X);
+            result.Y = MathF.Round(value.Y);
+            result.Z = MathF.Round(value.Z);
+            return result;
         }
 
         /// <summary>
@@ -995,10 +1007,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>The result of the vector subtraction.</returns>
         public static Vector3 Subtract(Vector3 value1, Vector3 value2)
         {
-            value1.X -= value2.X;
-            value1.Y -= value2.Y;
-            value1.Z -= value2.Z;
-            return value1;
+            Vector3 result;
+            result.X = value1.X - value2.X;
+            result.Y = value1.Y - value2.Y;
+            result.Z = value1.Z - value2.Z;
+            return result;
         }
 
         /// <summary>
@@ -1042,8 +1055,9 @@ namespace Microsoft.Xna.Framework
         /// <returns>Transformed <see cref="Vector3"/>.</returns>
         public static Vector3 Transform(Vector3 position, Matrix matrix)
         {
-            Transform(ref position, ref matrix, out position);
-            return position;
+            Vector3 result;
+            Transform(ref position, ref matrix, out result);
+            return result;
         }
 
         /// <summary>
@@ -1119,9 +1133,9 @@ namespace Microsoft.Xna.Framework
                 var position = sourceArray[sourceIndex + i];
                 destinationArray[destinationIndex + i] =
                     new Vector3(
-                        (position.X * matrix.M11) + (position.Y * matrix.M21) + (position.Z * matrix.M31) + matrix.M41,
-                        (position.X * matrix.M12) + (position.Y * matrix.M22) + (position.Z * matrix.M32) + matrix.M42,
-                        (position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43);
+                    (position.X * matrix.M11) + (position.Y * matrix.M21) + (position.Z * matrix.M31) + matrix.M41,
+                    (position.X * matrix.M12) + (position.Y * matrix.M22) + (position.Z * matrix.M32) + matrix.M42,
+                    (position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43);
             }
         }
 
@@ -1157,9 +1171,9 @@ namespace Microsoft.Xna.Framework
 
                 destinationArray[destinationIndex + i] =
                     new Vector3(
-                        position.X + x * rotation.W + (rotation.Y * z - rotation.Z * y),
-                        position.Y + y * rotation.W + (rotation.Z * x - rotation.X * z),
-                        position.Z + z * rotation.W + (rotation.X * y - rotation.Y * x));
+                    position.X + x * rotation.W + (rotation.Y * z - rotation.Z * y),
+                    position.Y + y * rotation.W + (rotation.Z * x - rotation.X * z),
+                    position.Z + z * rotation.W + (rotation.X * y - rotation.Y * x));
             }
         }
 
@@ -1182,12 +1196,12 @@ namespace Microsoft.Xna.Framework
 
             for (var i = 0; i < sourceArray.Length; i++)
             {
-                var position = sourceArray[i];                
+                var position = sourceArray[i];
                 destinationArray[i] =
                     new Vector3(
-                        (position.X*matrix.M11) + (position.Y*matrix.M21) + (position.Z*matrix.M31) + matrix.M41,
-                        (position.X*matrix.M12) + (position.Y*matrix.M22) + (position.Z*matrix.M32) + matrix.M42,
-                        (position.X*matrix.M13) + (position.Y*matrix.M23) + (position.Z*matrix.M33) + matrix.M43);
+                    (position.X*matrix.M11) + (position.Y*matrix.M21) + (position.Z*matrix.M31) + matrix.M41,
+                    (position.X*matrix.M12) + (position.Y*matrix.M22) + (position.Z*matrix.M32) + matrix.M42,
+                    (position.X*matrix.M13) + (position.Y*matrix.M23) + (position.Z*matrix.M33) + matrix.M43);
             }
         }
 
@@ -1218,9 +1232,9 @@ namespace Microsoft.Xna.Framework
 
                 destinationArray[i] =
                     new Vector3(
-                        position.X + x * rotation.W + (rotation.Y * z - rotation.Z * y),
-                        position.Y + y * rotation.W + (rotation.Z * x - rotation.X * z),
-                        position.Z + z * rotation.W + (rotation.X * y - rotation.Y * x));
+                    position.X + x * rotation.W + (rotation.Y * z - rotation.Z * y),
+                    position.Y + y * rotation.W + (rotation.Z * x - rotation.X * z),
+                    position.Z + z * rotation.W + (rotation.X * y - rotation.Y * x));
             }
         }
 
@@ -1236,8 +1250,9 @@ namespace Microsoft.Xna.Framework
         /// <returns>Transformed normal.</returns>
         public static Vector3 TransformNormal(Vector3 normal, Matrix matrix)
         {
-            TransformNormal(ref normal, ref matrix, out normal);
-            return normal;
+            Vector3 result;
+            TransformNormal(ref normal, ref matrix, out result);
+            return result;
         }
 
         /// <summary>
@@ -1287,9 +1302,9 @@ namespace Microsoft.Xna.Framework
 
                 destinationArray[destinationIndex + x] =
                      new Vector3(
-                        (normal.X * matrix.M11) + (normal.Y * matrix.M21) + (normal.Z * matrix.M31),
-                        (normal.X * matrix.M12) + (normal.Y * matrix.M22) + (normal.Z * matrix.M32),
-                        (normal.X * matrix.M13) + (normal.Y * matrix.M23) + (normal.Z * matrix.M33));
+                    (normal.X * matrix.M11) + (normal.Y * matrix.M21) + (normal.Z * matrix.M31),
+                    (normal.X * matrix.M12) + (normal.Y * matrix.M22) + (normal.Z * matrix.M32),
+                    (normal.X * matrix.M13) + (normal.Y * matrix.M23) + (normal.Z * matrix.M33));
             }
         }
 
@@ -1314,9 +1329,9 @@ namespace Microsoft.Xna.Framework
 
                 destinationArray[i] =
                     new Vector3(
-                        (normal.X*matrix.M11) + (normal.Y*matrix.M21) + (normal.Z*matrix.M31),
-                        (normal.X*matrix.M12) + (normal.Y*matrix.M22) + (normal.Z*matrix.M32),
-                        (normal.X*matrix.M13) + (normal.Y*matrix.M23) + (normal.Z*matrix.M33));
+                    (normal.X*matrix.M11) + (normal.Y*matrix.M21) + (normal.Z*matrix.M31),
+                    (normal.X*matrix.M12) + (normal.Y*matrix.M22) + (normal.Z*matrix.M32),
+                    (normal.X*matrix.M13) + (normal.Y*matrix.M23) + (normal.Z*matrix.M33));
             }
         }
 
@@ -1388,10 +1403,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>Sum of the vectors.</returns>
         public static Vector3 operator +(Vector3 value1, Vector3 value2)
         {
-            value1.X += value2.X;
-            value1.Y += value2.Y;
-            value1.Z += value2.Z;
-            return value1;
+            Vector3 result;
+            result.X = value1.X + value2.X;
+            result.Y = value1.Y + value2.Y;
+            result.Z = value1.Z + value2.Z;
+            return result;
         }
 
         /// <summary>
@@ -1401,8 +1417,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>Result of the inversion.</returns>
         public static Vector3 operator -(Vector3 value)
         {
-            value = new Vector3(-value.X, -value.Y, -value.Z);
-            return value;
+            Vector3 result;
+            result.X = -value.X;
+            result.Y = -value.Y;
+            result.Z = -value.Z;
+            return result;
         }
 
         /// <summary>
@@ -1413,10 +1432,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>Result of the vector subtraction.</returns>
         public static Vector3 operator -(Vector3 value1, Vector3 value2)
         {
-            value1.X -= value2.X;
-            value1.Y -= value2.Y;
-            value1.Z -= value2.Z;
-            return value1;
+            Vector3 result;
+            result.X = value1.X - value2.X;
+            result.Y = value1.Y - value2.Y;
+            result.Z = value1.Z - value2.Z;
+            return result;
         }
 
         /// <summary>
@@ -1427,10 +1447,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>Result of the vector multiplication.</returns>
         public static Vector3 operator *(Vector3 value1, Vector3 value2)
         {
-            value1.X *= value2.X;
-            value1.Y *= value2.Y;
-            value1.Z *= value2.Z;
-            return value1;
+            Vector3 result;
+            result.X = value1.X * value2.X;
+            result.Y = value1.Y * value2.Y;
+            result.Z = value1.Z * value2.Z;
+            return result;
         }
 
         /// <summary>
@@ -1441,10 +1462,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>Result of the vector multiplication with a scalar.</returns>
         public static Vector3 operator *(Vector3 value, float scaleFactor)
         {
-            value.X *= scaleFactor;
-            value.Y *= scaleFactor;
-            value.Z *= scaleFactor;
-            return value;
+            Vector3 result;
+            result.X = value.X * scaleFactor;
+            result.Y = value.Y * scaleFactor;
+            result.Z = value.Z * scaleFactor;
+            return result;
         }
 
         /// <summary>
@@ -1455,10 +1477,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>Result of the vector multiplication with a scalar.</returns>
         public static Vector3 operator *(float scaleFactor, Vector3 value)
         {
-            value.X *= scaleFactor;
-            value.Y *= scaleFactor;
-            value.Z *= scaleFactor;
-            return value;
+            Vector3 result;
+            result.X = value.X * scaleFactor;
+            result.Y = value.Y * scaleFactor;
+            result.Z = value.Z * scaleFactor;
+            return result;
         }
 
         /// <summary>
@@ -1469,10 +1492,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>The result of dividing the vectors.</returns>
         public static Vector3 operator /(Vector3 value1, Vector3 value2)
         {
-            value1.X /= value2.X;
-            value1.Y /= value2.Y;
-            value1.Z /= value2.Z;
-            return value1;
+            Vector3 result;
+            result.X = value1.X / value2.X;
+            result.Y = value1.Y / value2.Y;
+            result.Z = value1.Z / value2.Z;
+            return result;
         }
 
         /// <summary>
@@ -1483,11 +1507,12 @@ namespace Microsoft.Xna.Framework
         /// <returns>The result of dividing a vector by a scalar.</returns>
         public static Vector3 operator /(Vector3 value1, float divider)
         {
+            Vector3 result;
             float factor = 1 / divider;
-            value1.X *= factor;
-            value1.Y *= factor;
-            value1.Z *= factor;
-            return value1;
+            result.X = value1.X * factor;
+            result.Y = value1.Y * factor;
+            result.Z = value1.Z * factor;
+            return result;
         }
 
         #endregion

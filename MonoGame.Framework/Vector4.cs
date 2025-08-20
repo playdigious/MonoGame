@@ -194,11 +194,12 @@ namespace Microsoft.Xna.Framework
         /// <returns>The result of the vector addition.</returns>
         public static Vector4 Add(Vector4 value1, Vector4 value2)
         {
-            value1.X += value2.X;
-            value1.Y += value2.Y;
-            value1.Z += value2.Z;
-            value1.W += value2.W;
-            return value1;
+            Vector4 result;
+            result.X = value1.X + value2.X;
+            result.Y = value1.Y + value2.Y;
+            result.Z = value1.Z + value2.Z;
+            result.W = value1.W + value2.W;
+            return result;
         }
 
         /// <summary>
@@ -305,11 +306,12 @@ namespace Microsoft.Xna.Framework
         /// <returns>The rounded <see cref="Vector4"/>.</returns>
         public static Vector4 Ceiling(Vector4 value)
         {
-            value.X = MathF.Ceiling(value.X);
-            value.Y = MathF.Ceiling(value.Y);
-            value.Z = MathF.Ceiling(value.Z);
-            value.W = MathF.Ceiling(value.W);
-            return value;
+            Vector4 result;
+            result.X = MathF.Ceiling(value.X);
+            result.Y = MathF.Ceiling(value.Y);
+            result.Z = MathF.Ceiling(value.Z);
+            result.W = MathF.Ceiling(value.W);
+            return result;
         }
 
         /// <summary>
@@ -414,11 +416,12 @@ namespace Microsoft.Xna.Framework
         /// <returns>The result of dividing the vectors.</returns>
         public static Vector4 Divide(Vector4 value1, Vector4 value2)
         {
-            value1.W /= value2.W;
-            value1.X /= value2.X;
-            value1.Y /= value2.Y;
-            value1.Z /= value2.Z;
-            return value1;
+            Vector4 result;
+            result.X = value1.X / value2.X;
+            result.Y = value1.Y / value2.Y;
+            result.Z = value1.Z / value2.Z;
+            result.W = value1.W / value2.W;
+            return result;
         }
 
         /// <summary>
@@ -429,12 +432,13 @@ namespace Microsoft.Xna.Framework
         /// <returns>The result of dividing a vector by a scalar.</returns>
         public static Vector4 Divide(Vector4 value1, float divider)
         {
+            Vector4 result;
             float factor = 1f / divider;
-            value1.W *= factor;
-            value1.X *= factor;
-            value1.Y *= factor;
-            value1.Z *= factor;
-            return value1;
+            result.X = value1.X * factor;
+            result.Y = value1.Y * factor;
+            result.Z = value1.Z * factor;
+            result.W = value1.W * factor;
+            return result;
         }
 
         /// <summary>
@@ -446,10 +450,10 @@ namespace Microsoft.Xna.Framework
         public static void Divide(ref Vector4 value1, float divider, out Vector4 result)
         {
             float factor = 1f / divider;
-            result.W = value1.W * factor;
             result.X = value1.X * factor;
             result.Y = value1.Y * factor;
             result.Z = value1.Z * factor;
+            result.W = value1.W * factor;
         }
 
         /// <summary>
@@ -460,10 +464,10 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">The result of dividing the vectors as an output parameter.</param>
         public static void Divide(ref Vector4 value1, ref Vector4 value2, out Vector4 result)
         {
-            result.W = value1.W / value2.W;
             result.X = value1.X / value2.X;
             result.Y = value1.Y / value2.Y;
             result.Z = value1.Z / value2.Z;
+            result.W = value1.W / value2.W;
         }
 
         /// <summary>
@@ -529,11 +533,12 @@ namespace Microsoft.Xna.Framework
         /// <returns>The rounded <see cref="Vector4"/>.</returns>
         public static Vector4 Floor(Vector4 value)
         {
-            value.X = MathF.Floor(value.X);
-            value.Y = MathF.Floor(value.Y);
-            value.Z = MathF.Floor(value.Z);
-            value.W = MathF.Floor(value.W);
-            return value;
+            Vector4 result;
+            result.X = MathF.Floor(value.X);
+            result.Y = MathF.Floor(value.Y);
+            result.Z = MathF.Floor(value.Z);
+            result.W = MathF.Floor(value.W);
+            return result;
         }
 
         /// <summary>
@@ -577,9 +582,9 @@ namespace Microsoft.Xna.Framework
         public static Vector4 Hermite(Vector4 value1, Vector4 tangent1, Vector4 value2, Vector4 tangent2, float amount)
         {
             return new Vector4(MathHelper.Hermite(value1.X, tangent1.X, value2.X, tangent2.X, amount),
-                               MathHelper.Hermite(value1.Y, tangent1.Y, value2.Y, tangent2.Y, amount),
-                               MathHelper.Hermite(value1.Z, tangent1.Z, value2.Z, tangent2.Z, amount),
-                               MathHelper.Hermite(value1.W, tangent1.W, value2.W, tangent2.W, amount));
+                MathHelper.Hermite(value1.Y, tangent1.Y, value2.Y, tangent2.Y, amount),
+                MathHelper.Hermite(value1.Z, tangent1.Z, value2.Z, tangent2.Z, amount),
+                MathHelper.Hermite(value1.W, tangent1.W, value2.W, tangent2.W, amount));
         }
 
         /// <summary>
@@ -751,11 +756,12 @@ namespace Microsoft.Xna.Framework
         /// <returns>The result of the vector multiplication.</returns>
         public static Vector4 Multiply(Vector4 value1, Vector4 value2)
         {
-            value1.W *= value2.W;
-            value1.X *= value2.X;
-            value1.Y *= value2.Y;
-            value1.Z *= value2.Z;
-            return value1;
+            Vector4 result;
+            result.X = value1.X * value2.X;
+            result.Y = value1.Y * value2.Y;
+            result.Z = value1.Z * value2.Z;
+            result.W = value1.W * value2.W;
+            return result;
         }
 
         /// <summary>
@@ -766,11 +772,12 @@ namespace Microsoft.Xna.Framework
         /// <returns>The result of the vector multiplication with a scalar.</returns>
         public static Vector4 Multiply(Vector4 value1, float scaleFactor)
         {
-            value1.W *= scaleFactor;
-            value1.X *= scaleFactor;
-            value1.Y *= scaleFactor;
-            value1.Z *= scaleFactor;
-            return value1;
+            Vector4 result;
+            result.X = value1.X * scaleFactor;
+            result.Y = value1.Y * scaleFactor;
+            result.Z = value1.Z * scaleFactor;
+            result.W = value1.W * scaleFactor;
+            return result;
         }
 
         /// <summary>
@@ -781,10 +788,10 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">The result of the multiplication with a scalar as an output parameter.</param>
         public static void Multiply(ref Vector4 value1, float scaleFactor, out Vector4 result)
         {
-            result.W = value1.W * scaleFactor;
             result.X = value1.X * scaleFactor;
             result.Y = value1.Y * scaleFactor;
             result.Z = value1.Z * scaleFactor;
+            result.W = value1.W * scaleFactor;
         }
 
         /// <summary>
@@ -795,10 +802,10 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">The result of the vector multiplication as an output parameter.</param>
         public static void Multiply(ref Vector4 value1, ref Vector4 value2, out Vector4 result)
         {
-            result.W = value1.W * value2.W;
             result.X = value1.X * value2.X;
             result.Y = value1.Y * value2.Y;
             result.Z = value1.Z * value2.Z;
+            result.W = value1.W * value2.W;
         }
 
         /// <summary>
@@ -808,8 +815,12 @@ namespace Microsoft.Xna.Framework
         /// <returns>The result of the vector inversion.</returns>
         public static Vector4 Negate(Vector4 value)
         {
-            value = new Vector4(-value.X, -value.Y, -value.Z, -value.W);
-            return value;
+            Vector4 result;
+            result.X = -value.X;
+            result.Y = -value.Y;
+            result.Z = -value.Z;
+            result.W = -value.W;
+            return result;
         }
 
         /// <summary>
@@ -845,9 +856,14 @@ namespace Microsoft.Xna.Framework
         /// <returns>Unit vector.</returns>
         public static Vector4 Normalize(Vector4 value)
         {
+            Vector4 result;
             float factor = MathF.Sqrt((value.X * value.X) + (value.Y * value.Y) + (value.Z * value.Z) + (value.W * value.W));
             factor = 1f / factor;
-            return new Vector4(value.X*factor,value.Y*factor,value.Z*factor,value.W*factor);
+            result.X = value.X * factor;
+            result.Y = value.Y * factor;
+            result.Z = value.Z * factor;
+            result.W = value.W * factor;
+            return result;
         }
 
         /// <summary>
@@ -859,10 +875,10 @@ namespace Microsoft.Xna.Framework
         {
             float factor = MathF.Sqrt((value.X * value.X) + (value.Y * value.Y) + (value.Z * value.Z) + (value.W * value.W));
             factor = 1f / factor;
-            result.W = value.W * factor;
             result.X = value.X * factor;
             result.Y = value.Y * factor;
             result.Z = value.Z * factor;
+            result.W = value.W * factor;
         }
 
         /// <summary>
@@ -883,11 +899,12 @@ namespace Microsoft.Xna.Framework
         /// <returns>The rounded <see cref="Vector4"/>.</returns>
         public static Vector4 Round(Vector4 value)
         {
-            value.X = MathF.Round(value.X);
-            value.Y = MathF.Round(value.Y);
-            value.Z = MathF.Round(value.Z);
-            value.W = MathF.Round(value.W);
-            return value;
+            Vector4 result;
+            result.X = MathF.Round(value.X);
+            result.Y = MathF.Round(value.Y);
+            result.Z = MathF.Round(value.Z);
+            result.W = MathF.Round(value.W);
+            return result;
         }
 
         /// <summary>
@@ -942,11 +959,12 @@ namespace Microsoft.Xna.Framework
         /// <returns>The result of the vector subtraction.</returns>
         public static Vector4 Subtract(Vector4 value1, Vector4 value2)
         {
-            value1.W -= value2.W;
-            value1.X -= value2.X;
-            value1.Y -= value2.Y;
-            value1.Z -= value2.Z;
-            return value1;
+            Vector4 result;
+            result.X = value1.X - value2.X;
+            result.Y = value1.Y - value2.Y;
+            result.Z = value1.Z - value2.Z;
+            result.W = value1.W - value2.W;
+            return result;
         }
 
         /// <summary>
@@ -957,10 +975,10 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">The result of the vector subtraction as an output parameter.</param>
         public static void Subtract(ref Vector4 value1, ref Vector4 value2, out Vector4 result)
         {
-            result.W = value1.W - value2.W;
             result.X = value1.X - value2.X;
             result.Y = value1.Y - value2.Y;
             result.Z = value1.Z - value2.Z;
+            result.W = value1.W - value2.W;
         }
 
         #region Transform
@@ -1025,8 +1043,9 @@ namespace Microsoft.Xna.Framework
         /// <returns>Transformed <see cref="Vector4"/>.</returns>
         public static Vector4 Transform(Vector4 value, Matrix matrix)
         {
-            Transform(ref value, ref matrix, out value);
-            return value;
+            Vector4 result;
+            Transform(ref value, ref matrix, out result);
+            return result;
         }
 
         /// <summary>
@@ -1311,7 +1330,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="value1"><see cref="Vector4"/> instance on the left of the not equal sign.</param>
         /// <param name="value2"><see cref="Vector4"/> instance on the right of the not equal sign.</param>
-        /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>	
+        /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>
         public static bool operator !=(Vector4 value1, Vector4 value2)
         {
             return !(value1 == value2);
@@ -1325,11 +1344,12 @@ namespace Microsoft.Xna.Framework
         /// <returns>Sum of the vectors.</returns>
         public static Vector4 operator +(Vector4 value1, Vector4 value2)
         {
-            value1.W += value2.W;
-            value1.X += value2.X;
-            value1.Y += value2.Y;
-            value1.Z += value2.Z;
-            return value1;
+            Vector4 result;
+            result.X = value1.X + value2.X;
+            result.Y = value1.Y + value2.Y;
+            result.Z = value1.Z + value2.Z;
+            result.W = value1.W + value2.W;
+            return result;
         }
 
         /// <summary>
@@ -1340,11 +1360,12 @@ namespace Microsoft.Xna.Framework
         /// <returns>Result of the vector subtraction.</returns>
         public static Vector4 operator -(Vector4 value1, Vector4 value2)
         {
-            value1.W -= value2.W;
-            value1.X -= value2.X;
-            value1.Y -= value2.Y;
-            value1.Z -= value2.Z;
-            return value1;
+            Vector4 result;
+            result.X = value1.X - value2.X;
+            result.Y = value1.Y - value2.Y;
+            result.Z = value1.Z - value2.Z;
+            result.W = value1.W - value2.W;
+            return result;
         }
 
         /// <summary>
@@ -1355,11 +1376,12 @@ namespace Microsoft.Xna.Framework
         /// <returns>Result of the vector multiplication.</returns>
         public static Vector4 operator *(Vector4 value1, Vector4 value2)
         {
-            value1.W *= value2.W;
-            value1.X *= value2.X;
-            value1.Y *= value2.Y;
-            value1.Z *= value2.Z;
-            return value1;
+            Vector4 result;
+            result.X = value1.X * value2.X;
+            result.Y = value1.Y * value2.Y;
+            result.Z = value1.Z * value2.Z;
+            result.W = value1.W * value2.W;
+            return result;
         }
 
         /// <summary>
@@ -1370,11 +1392,12 @@ namespace Microsoft.Xna.Framework
         /// <returns>Result of the vector multiplication with a scalar.</returns>
         public static Vector4 operator *(Vector4 value, float scaleFactor)
         {
-            value.W *= scaleFactor;
-            value.X *= scaleFactor;
-            value.Y *= scaleFactor;
-            value.Z *= scaleFactor;
-            return value;
+            Vector4 result;
+            result.X = value.X * scaleFactor;
+            result.Y = value.Y * scaleFactor;
+            result.Z = value.Z * scaleFactor;
+            result.W = value.W * scaleFactor;
+            return result;
         }
 
         /// <summary>
@@ -1385,11 +1408,12 @@ namespace Microsoft.Xna.Framework
         /// <returns>Result of the vector multiplication with a scalar.</returns>
         public static Vector4 operator *(float scaleFactor, Vector4 value)
         {
-            value.W *= scaleFactor;
-            value.X *= scaleFactor;
-            value.Y *= scaleFactor;
-            value.Z *= scaleFactor;
-            return value;
+            Vector4 result;
+            result.X = value.X * scaleFactor;
+            result.Y = value.Y * scaleFactor;
+            result.Z = value.Z * scaleFactor;
+            result.W = value.W * scaleFactor;
+            return result;
         }
 
         /// <summary>
@@ -1400,11 +1424,12 @@ namespace Microsoft.Xna.Framework
         /// <returns>The result of dividing the vectors.</returns>
         public static Vector4 operator /(Vector4 value1, Vector4 value2)
         {
-            value1.W /= value2.W;
-            value1.X /= value2.X;
-            value1.Y /= value2.Y;
-            value1.Z /= value2.Z;
-            return value1;
+            Vector4 result;
+            result.X = value1.X / value2.X;
+            result.Y = value1.Y / value2.Y;
+            result.Z = value1.Z / value2.Z;
+            result.W = value1.W / value2.W;
+            return result;
         }
 
         /// <summary>
@@ -1415,12 +1440,13 @@ namespace Microsoft.Xna.Framework
         /// <returns>The result of dividing a vector by a scalar.</returns>
         public static Vector4 operator /(Vector4 value1, float divider)
         {
+            Vector4 result;
             float factor = 1f / divider;
-            value1.W *= factor;
-            value1.X *= factor;
-            value1.Y *= factor;
-            value1.Z *= factor;
-            return value1;
+            result.X = value1.X * factor;
+            result.Y = value1.Y * factor;
+            result.Z = value1.Z * factor;
+            result.W = value1.W * factor;
+            return result;
         }
 
         #endregion

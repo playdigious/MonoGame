@@ -117,7 +117,7 @@ jobs:
       - name: Run Tools Tests
         run:   |
               if [ "$RUNNER_OS" == "Windows" ]; then
-                    dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release
+                    dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release -m:1
               elif [ "$RUNNER_OS" == "Linux" ]; then
                     MGFXC_WINE_PATH=/home/runner/.winemonogame dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release --filter="TestCategory!=Audio"
               else

@@ -150,7 +150,7 @@ jobs:
           - name: Setup .NET
             uses: actions/setup-dotnet@v4
             with:
-              dotnet-version: '8.0.x'
+              dotnet-version: '${{ env.DotnetVersion }}'
 
           - name: Expose GitHub Runtime
             uses: crazy-max/ghaction-github-runtime@v3
@@ -206,7 +206,7 @@ jobs:
         if: runner.environment == 'github-hosted'
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '${{ env.DotnetVersion }}'
 
       - name: install wine64 on linux
         if: runner.os == 'Linux' && runner.environment == 'github-hosted'

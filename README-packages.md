@@ -2,23 +2,28 @@
 
 ![MonoGame](https://raw.githubusercontent.com/MonoGame/MonoGame.Logo/refs/heads/master/FullColorOnLight/LogoOnly_128px.png)
 
- [![Join the chat at https://discord.gg/monogame](https://img.shields.io/discord/355231098122272778?style=flat-square&color=%237289DA&label=Discord%20server&logo=discord&logoColor=white)](https://discord.gg/monogame) 
+ [![Join the chat at https://discord.gg/monogame](https://img.shields.io/discord/355231098122272778?style=flat-square&color=%237289DA&label=Discord%20server&logo=discord&logoColor=white)](https://discord.gg/monogame)
  ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/monogame/monogame/main.yml?style=flat-square)
- [![Donate](https://img.shields.io/badge/donate-F1465A?style=flat-square&logo=monogame&logoColor=FFFFFF)](https://monogame.net/donate/) 
+ [![Donate](https://img.shields.io/badge/donate-F1465A?style=flat-square&logo=monogame&logoColor=FFFFFF)](https://monogame.net/donate/)
 
  One framework for creating powerful cross-platform games
 
-[Supported Platforms](#supported-platforms) • 
-[Resources](#resources) • 
-[Samples](#samples) • 
-[Support and Contributions](#support-and-contributions) • 
-[Source Code](#source-code) • 
-[Helpful Links](#helpful-links) • 
+[Supported Platforms](#supported-platforms) •
+[Resources](#resources) •
+[Samples](#samples) •
+[Support and Contributions](#support-and-contributions) •
+[Source Code](#source-code) •
+[Helpful Links](#helpful-links) •
 [License](#license)
+
+    > ### Upgrade Notes for 3.8.4.1
+    >
+    > Please check the [update guide for 3.8.x projects](https://docs.monogame.net/articles/migration/migrate_38.html) for any critical information when updating your project to 3.8.4.1 and beyond, as MonoGame continues to improve its tooling.
+    > Especially if you are upgrading from pre 3.8.4 releases.
 
 ## Overview
 
-**MonoGame** is a simple and powerful .NET framework for creating games for desktop PCs, video game consoles, and mobile devices using the C# programming language. It has been successfully used to create games such as [Streets of Rage 4](https://store.steampowered.com/app/985890/Streets_of_Rage_4/), [Carrion](https://store.steampowered.com/app/953490/CARRION/), [Celeste](https://store.steampowered.com/app/504230/Celeste/), [Stardew Valley](https://store.steampowered.com/app/413150/Stardew_Valley/), and [many others](https://monogame.net/showcase/). 
+**MonoGame** is a simple and powerful .NET framework for creating games for desktop PCs, video game consoles, and mobile devices using the C# programming language. It has been successfully used to create games such as [Streets of Rage 4](https://store.steampowered.com/app/985890/Streets_of_Rage_4/), [Carrion](https://store.steampowered.com/app/953490/CARRION/), [Celeste](https://store.steampowered.com/app/504230/Celeste/), [Stardew Valley](https://store.steampowered.com/app/413150/Stardew_Valley/), and [many others](https://monogame.net/showcase/).
 
 It is an open-source re-implementation of the discontinued [Microsoft's XNA Framework](https://msdn.microsoft.com/en-us/library/bb200104.aspx).
 

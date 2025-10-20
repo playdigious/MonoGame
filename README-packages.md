@@ -16,10 +16,10 @@
 [Helpful Links](#helpful-links) •
 [License](#license)
 
-    > ### Upgrade Notes for 3.8.4.1
-    >
-    > Please check the [update guide for 3.8.x projects](https://docs.monogame.net/articles/migration/migrate_38.html) for any critical information when updating your project to 3.8.4.1 and beyond, as MonoGame continues to improve its tooling.
-    > Especially if you are upgrading from pre 3.8.4 releases.
+> ### Upgrade Notes for 3.8.4.1
+>
+> Please check the [update guide for 3.8.x projects](https://docs.monogame.net/articles/migration/migrate_38.html) for any critical information when updating your project to 3.8.4.1 and beyond, as MonoGame continues to improve its tooling.
+> Especially if you are upgrading from pre 3.8.4 releases.
 
 ## Overview
 

@@ -78,7 +78,8 @@ public class BuildContext : FrostingContext
         {
             MSBuildSettings = DotNetMSBuildSettings,
             Verbosity = DotNetVerbosity.Minimal,
-            Configuration = buildConfiguration
+            Configuration = buildConfiguration,
+            WorkingDirectory = Directory.GetCurrentDirectory()
         };
 
         DotNetPackSettings = new DotNetPackSettings
@@ -86,7 +87,8 @@ public class BuildContext : FrostingContext
             MSBuildSettings = DotNetMSBuildSettings,
             Verbosity = DotNetVerbosity.Minimal,
             OutputDirectory = NuGetsDirectory,
-            Configuration = buildConfiguration
+            Configuration = buildConfiguration,
+            WorkingDirectory = Directory.GetCurrentDirectory()
         };
 
         MSBuildSettings = new MSBuildSettings
@@ -113,14 +115,16 @@ public class BuildContext : FrostingContext
             MSBuildSettings = DotNetMSBuildSettings,
             Verbosity = DotNetVerbosity.Minimal,
             Configuration = buildConfiguration,
-            SelfContained = false
+            SelfContained = false,
+            WorkingDirectory = Directory.GetCurrentDirectory()
         };
         // SelfContained needs to be default for MacOS
         DotNetPublishSettingsForMac = new DotNetPublishSettings
         {
             MSBuildSettings = DotNetMSBuildSettings,
             Verbosity = DotNetVerbosity.Minimal,
-            Configuration = buildConfiguration
+            Configuration = buildConfiguration,
+            WorkingDirectory = Directory.GetCurrentDirectory()
         };
 
         Console.WriteLine($"Version: {Version}");
@@ -176,7 +180,8 @@ public class BuildContext : FrostingContext
             new ProcessSettings()
             {
                 Arguments = $"workload list",
-                RedirectStandardOutput = true
+                RedirectStandardOutput = true,
+                WorkingDirectory = Directory.GetCurrentDirectory(),
             },
             out IEnumerable<string> processOutput
         );

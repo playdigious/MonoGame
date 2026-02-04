@@ -9,6 +9,8 @@ on:
     branches:
       - master
 
+env:
+  DotnetVersion: 8.0.404
 
 jobs:
   build:
@@ -24,13 +26,25 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Generate global.json
+        run: |
+          echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
+
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '${{ env.DotnetVersion }}'
+          
+      - name: Setup Android Dependencies
+        uses: monogame/monogame-actions/install-android-dependencies@v1
 
-      - name: Setup DotNet on linux/Windows
-        if: runner.environment == 'github-hosted' && (runner.os == 'Linux' || runner.os == 'windows')
+      - name: Setup DotNet on Windows
+        if: runner.environment == 'github-hosted' && runner.os == 'windows'
+        run: |
+          dotnet workload install android ios
+
+      - name: Setup DotNet on linux
+        if: runner.environment == 'github-hosted' && runner.os == 'Linux'
         run: |
           dotnet workload install android
 
@@ -103,7 +117,7 @@ jobs:
       - name: Run Tools Tests
         run:   |
               if [ "$RUNNER_OS" == "Windows" ]; then
-                    dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release
+                    dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release -m:1
               elif [ "$RUNNER_OS" == "Linux" ]; then
                     MGFXC_WINE_PATH=/home/runner/.winemonogame dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release --filter="TestCategory!=Audio"
               else
@@ -136,7 +150,7 @@ jobs:
           - name: Setup .NET
             uses: actions/setup-dotnet@v4
             with:
-              dotnet-version: '8.0.x'
+              dotnet-version: '${{ env.DotnetVersion }}'
 
           - name: Expose GitHub Runtime
             uses: crazy-max/ghaction-github-runtime@v3
@@ -192,7 +206,7 @@ jobs:
         if: runner.environment == 'github-hosted'
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '${{ env.DotnetVersion }}'
 
       - name: install wine64 on linux
         if: runner.os == 'Linux' && runner.environment == 'github-hosted'

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0-android</TargetFramework>
+    <TargetFramework>net9.0-android</TargetFramework>
     <SupportedOSPlatformVersion>23</SupportedOSPlatformVersion>
     <DefineConstants>ANDROID;GLES;STBSHARP_INTERNAL</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -16,10 +16,6 @@
 
   <ItemGroup>
     <None Include="..\README-packages.md" Pack="true" PackagePath="\"/>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="MonoGame.Library.OpenAL" Version="1.23.1.10" />
   </ItemGroup>
 
   <ItemGroup>
@@ -70,13 +66,7 @@
     <Compile Include="Platform\Input\MessageBox.Android.cs" />
     <Compile Include="Platform\Input\Mouse.Default.cs" />
     <Compile Include="Platform\Input\MouseCursor.Default.cs" />
-    <Compile Include="Platform\Media\MediaLibrary.Android.cs" />
     <Compile Include="Platform\Media\MediaPlayer.Default.cs" />
-    <Compile Include="Platform\Media\Song.Android.cs" />
-    <Compile Include="Platform\Media\SuperVideoPlayer.Android.cs" />
-    <Compile Include="Platform\Media\SuperVideoPlayer.Android.Obsolete.cs" />
-    <Compile Include="Platform\Media\Video.Android.cs" />
-    <Compile Include="Platform\Media\VideoPlayer.Android.cs" />
     <Compile Include="Platform\PrimaryThreadLoader.cs" />
     <Compile Include="Platform\TitleContainer.Android.cs" />
     <Compile Include="Platform\Utilities\FuncLoader.Android.cs" />

@@ -139,9 +139,10 @@ namespace Microsoft.Xna.Framework
         /// <returns>Result of the inversion.</returns>
         public static Vector2 operator -(Vector2 value)
         {
-            value.X = -value.X;
-            value.Y = -value.Y;
-            return value;
+            Vector2 result;
+            result.X = -value.X;
+            result.Y = -value.Y;
+            return result;
         }
 
         /// <summary>
@@ -152,9 +153,10 @@ namespace Microsoft.Xna.Framework
         /// <returns>Sum of the vectors.</returns>
         public static Vector2 operator +(Vector2 value1, Vector2 value2)
         {
-            value1.X += value2.X;
-            value1.Y += value2.Y;
-            return value1;
+            Vector2 result;
+            result.X = value1.X + value2.X;
+            result.Y = value1.Y + value2.Y;
+            return result;
         }
 
         /// <summary>
@@ -165,9 +167,10 @@ namespace Microsoft.Xna.Framework
         /// <returns>Result of the vector subtraction.</returns>
         public static Vector2 operator -(Vector2 value1, Vector2 value2)
         {
-            value1.X -= value2.X;
-            value1.Y -= value2.Y;
-            return value1;
+            Vector2 result;
+            result.X = value1.X - value2.X;
+            result.Y = value1.Y - value2.Y;
+            return result;
         }
 
         /// <summary>
@@ -178,9 +181,10 @@ namespace Microsoft.Xna.Framework
         /// <returns>Result of the vector multiplication.</returns>
         public static Vector2 operator *(Vector2 value1, Vector2 value2)
         {
-            value1.X *= value2.X;
-            value1.Y *= value2.Y;
-            return value1;
+            Vector2 result;
+            result.X = value1.X * value2.X;
+            result.Y = value1.Y * value2.Y;
+            return result;
         }
 
         /// <summary>
@@ -191,9 +195,10 @@ namespace Microsoft.Xna.Framework
         /// <returns>Result of the vector multiplication with a scalar.</returns>
         public static Vector2 operator *(Vector2 value, float scaleFactor)
         {
-            value.X *= scaleFactor;
-            value.Y *= scaleFactor;
-            return value;
+            Vector2 result;
+            result.X = value.X * scaleFactor;
+            result.Y = value.Y * scaleFactor;
+            return result;
         }
 
         /// <summary>
@@ -204,9 +209,10 @@ namespace Microsoft.Xna.Framework
         /// <returns>Result of the vector multiplication with a scalar.</returns>
         public static Vector2 operator *(float scaleFactor, Vector2 value)
         {
-            value.X *= scaleFactor;
-            value.Y *= scaleFactor;
-            return value;
+            Vector2 result;
+            result.X = value.X * scaleFactor;
+            result.Y = value.Y * scaleFactor;
+            return result;
         }
 
         /// <summary>
@@ -218,9 +224,10 @@ namespace Microsoft.Xna.Framework
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 operator /(Vector2 value1, Vector2 value2)
         {
-            value1.X /= value2.X;
-            value1.Y /= value2.Y;
-            return value1;
+            Vector2 result;
+            result.X = value1.X / value2.X;
+            result.Y = value1.Y / value2.Y;
+            return result;
         }
 
         /// <summary>
@@ -232,10 +239,11 @@ namespace Microsoft.Xna.Framework
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 operator /(Vector2 value1, float divider)
         {
+            Vector2 result;
             float factor = 1 / divider;
-            value1.X *= factor;
-            value1.Y *= factor;
-            return value1;
+            result.X = value1.X * factor;
+            result.Y = value1.Y * factor;
+            return result;
         }
 
         /// <summary>
@@ -254,7 +262,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="value1"><see cref="Vector2"/> instance on the left of the not equal sign.</param>
         /// <param name="value2"><see cref="Vector2"/> instance on the right of the not equal sign.</param>
-        /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>	
+        /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>
         public static bool operator !=(Vector2 value1, Vector2 value2)
         {
             return value1.X != value2.X || value1.Y != value2.Y;
@@ -272,9 +280,10 @@ namespace Microsoft.Xna.Framework
         /// <returns>The result of the vector addition.</returns>
         public static Vector2 Add(Vector2 value1, Vector2 value2)
         {
-            value1.X += value2.X;
-            value1.Y += value2.Y;
-            return value1;
+            Vector2 result;
+            result.X = value1.X + value2.X;
+            result.Y = value1.Y + value2.Y;
+            return result;
         }
 
         /// <summary>
@@ -369,9 +378,10 @@ namespace Microsoft.Xna.Framework
         /// <returns>The rounded <see cref="Vector2"/>.</returns>
         public static Vector2 Ceiling(Vector2 value)
         {
-            value.X = MathF.Ceiling(value.X);
-            value.Y = MathF.Ceiling(value.Y);
-            return value;
+            Vector2 result;
+            result.X = MathF.Ceiling(value.X);
+            result.Y = MathF.Ceiling(value.Y);
+            return result;
         }
 
         /// <summary>
@@ -468,9 +478,10 @@ namespace Microsoft.Xna.Framework
         /// <returns>The result of dividing the vectors.</returns>
         public static Vector2 Divide(Vector2 value1, Vector2 value2)
         {
-            value1.X /= value2.X;
-            value1.Y /= value2.Y;
-            return value1;
+            Vector2 result;
+            result.X = value1.X / value2.X;
+            result.Y = value1.Y / value2.Y;
+            return result;
         }
 
         /// <summary>
@@ -493,10 +504,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>The result of dividing a vector by a scalar.</returns>
         public static Vector2 Divide(Vector2 value1, float divider)
         {
+            Vector2 result;
             float factor = 1 / divider;
-            value1.X *= factor;
-            value1.Y *= factor;
-            return value1;
+            result.X = value1.X * factor;
+            result.Y = value1.Y * factor;
+            return result;
         }
 
         /// <summary>
@@ -575,9 +587,10 @@ namespace Microsoft.Xna.Framework
         /// <returns>The rounded <see cref="Vector2"/>.</returns>
         public static Vector2 Floor(Vector2 value)
         {
-            value.X = MathF.Floor(value.X);
-            value.Y = MathF.Floor(value.Y);
-            return value;
+            Vector2 result;
+            result.X = MathF.Floor(value.X);
+            result.Y = MathF.Floor(value.Y);
+            return result;
         }
 
         /// <summary>
@@ -705,7 +718,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="amount">Weighting value(between 0.0 and 1.0).</param>
         /// <param name="result">The result of linear interpolation of the specified vectors as an output parameter.</param>
         public static void LerpPrecise(ref Vector2 value1, ref Vector2 value2, float amount, out Vector2 result)
-        { 
+        {
             result.X = MathHelper.LerpPrecise(value1.X, value2.X, amount);
             result.Y = MathHelper.LerpPrecise(value1.Y, value2.Y, amount);
         }
@@ -766,9 +779,10 @@ namespace Microsoft.Xna.Framework
         /// <returns>The result of the vector multiplication.</returns>
         public static Vector2 Multiply(Vector2 value1, Vector2 value2)
         {
-            value1.X *= value2.X;
-            value1.Y *= value2.Y;
-            return value1;
+            Vector2 result;
+            result.X = value1.X * value2.X;
+            result.Y = value1.Y * value2.Y;
+            return result;
         }
 
         /// <summary>
@@ -791,9 +805,10 @@ namespace Microsoft.Xna.Framework
         /// <returns>The result of the vector multiplication with a scalar.</returns>
         public static Vector2 Multiply(Vector2 value1, float scaleFactor)
         {
-            value1.X *= scaleFactor;
-            value1.Y *= scaleFactor;
-            return value1;
+            Vector2 result;
+            result.X = value1.X * scaleFactor;
+            result.Y = value1.Y * scaleFactor;
+            return result;
         }
 
         /// <summary>
@@ -815,9 +830,10 @@ namespace Microsoft.Xna.Framework
         /// <returns>The result of the vector inversion.</returns>
         public static Vector2 Negate(Vector2 value)
         {
-            value.X = -value.X;
-            value.Y = -value.Y;
-            return value;
+            Vector2 result;
+            result.X =  -value.X;
+            result.Y = -value.Y;
+            return result;
         }
 
         /// <summary>
@@ -848,10 +864,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>Unit vector.</returns>
         public static Vector2 Normalize(Vector2 value)
         {
+            Vector2 result;
             float val = 1.0f / MathF.Sqrt((value.X * value.X) + (value.Y * value.Y));
-            value.X *= val;
-            value.Y *= val;
-            return value;
+            result.X = value.X * val;
+            result.Y = value.Y * val;
+            return result;
         }
 
         /// <summary>
@@ -910,9 +927,10 @@ namespace Microsoft.Xna.Framework
         /// <returns>The rounded <see cref="Vector2"/>.</returns>
         public static Vector2 Round(Vector2 value)
         {
-            value.X = MathF.Round(value.X);
-            value.Y = MathF.Round(value.Y);
-            return value;
+            Vector2 result;
+            result.X = MathF.Round(value.X);
+            result.Y = MathF.Round(value.Y);
+            return result;
         }
 
         /// <summary>
@@ -961,9 +979,10 @@ namespace Microsoft.Xna.Framework
         /// <returns>The result of the vector subtraction.</returns>
         public static Vector2 Subtract(Vector2 value1, Vector2 value2)
         {
-            value1.X -= value2.X;
-            value1.Y -= value2.Y;
-            return value1;
+            Vector2 result;
+            result.X = value1.X - value2.X;
+            result.Y = value1.Y - value2.Y;
+            return result;
         }
 
         /// <summary>
@@ -1030,8 +1049,9 @@ namespace Microsoft.Xna.Framework
         /// <returns>Transformed <see cref="Vector2"/>.</returns>
         public static Vector2 Transform(Vector2 value, Quaternion rotation)
         {
-            Transform(ref value, ref rotation, out value);
-            return value;
+            Vector2 result;
+            Transform(ref value, ref rotation, out result);
+            return result;
         }
 
         /// <summary>
@@ -1125,7 +1145,7 @@ namespace Microsoft.Xna.Framework
                 var destination = destinationArray[destinationIndex + x];
 
                 Vector2 v;
-                Transform(ref position,ref rotation,out v); 
+                Transform(ref position,ref rotation,out v);
 
                 destination.X = v.X;
                 destination.Y = v.Y;
@@ -1253,6 +1273,79 @@ namespace Microsoft.Xna.Framework
                 destinationArray[i] = new Vector2((normal.X * matrix.M11) + (normal.Y * matrix.M21),
                                                   (normal.X * matrix.M12) + (normal.Y * matrix.M22));
             }
+        }
+
+        /// <summary>
+        /// Rotates a vector by the specified number of radians
+        /// </summary>
+        /// <param name="value">The vector to be rotated.</param>
+        /// <param name="radians">The amount to rotate the vector.</param>
+        /// <returns>A rotated copy of value.</returns>
+        /// <remarks>
+        /// A positive angle and negative angle
+        /// would rotate counterclockwise and clockwise,
+        /// respectively
+        /// </remarks>
+        public static Vector2 Rotate(Vector2 value, float radians)
+        {
+            float cos = MathF.Cos(radians);
+            float sin = MathF.Sin(radians);
+
+            return new Vector2(value.X * cos - value.Y * sin, value.X * sin + value.Y * cos);
+        }
+
+        /// <summary>
+        /// Rotates a <see cref="Vector2"/> by the specified number of radians
+        /// </summary>
+        /// <param name="radians">The amount to rotate this <see cref="Vector2"/>.</param>
+        /// <remarks>
+        /// A positive angle and negative angle
+        /// would rotate counterclockwise and clockwise,
+        /// respectively
+        /// </remarks>
+        public void Rotate(float radians)
+        {
+            float cos = MathF.Cos(radians);
+            float sin = MathF.Sin(radians);
+
+            float oldx = X;
+
+            X = X * cos - Y * sin;
+            Y = oldx * sin + Y * cos;
+        }
+
+        /// <summary>
+        /// Rotates a <see cref="Vector2"/> around another <see cref="Vector2"/> representing a location
+        /// </summary>
+        /// <param name="value">The <see cref="Vector2"/> to be rotated</param>
+        /// <param name="origin">The origin location to be rotated around</param>
+        /// <param name="radians">The amount to rotate by in radians</param>
+        /// <returns>The rotated <see cref="Vector2"/></returns>
+        /// <remarks>
+        /// A positive angle and negative angle
+        /// would rotate counterclockwise and clockwise,
+        /// respectively
+        /// </remarks>
+        public static Vector2 RotateAround(Vector2 value, Vector2 origin, float radians)
+        {
+            return Rotate(value - origin, radians) + origin;
+        }
+
+        /// <summary>
+        /// Rotates a <see cref="Vector2"/> around another <see cref="Vector2"/> representing a location
+        /// </summary>
+        /// <param name="origin">The origin location to be rotated around</param>
+        /// <param name="radians">The amount to rotate by in radians</param>
+        /// <remarks>
+        /// A positive angle and negative angle
+        /// would rotate counterclockwise and clockwise,
+        /// respectively
+        /// </remarks>
+        public void RotateAround(Vector2 origin, float radians)
+        {
+            this -= origin;
+            Rotate(radians);
+            this += origin;
         }
 
         /// <summary>

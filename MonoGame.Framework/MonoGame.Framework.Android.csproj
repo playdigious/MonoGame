@@ -18,11 +18,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\README-packages.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="bin\**\*" />
     <Compile Remove="obj\**\*" />
     <Compile Remove="Platform\**\*" />
     <Compile Remove="Properties\**\*" />
     <Compile Remove="Utilities\System.Numerics.Vectors\**\*" />
+    <Compile Remove="Devices\**\*" />
   </ItemGroup>
 
   <ItemGroup>
@@ -64,13 +69,7 @@
     <Compile Include="Platform\Input\MessageBox.Android.cs" />
     <Compile Include="Platform\Input\Mouse.Default.cs" />
     <Compile Include="Platform\Input\MouseCursor.Default.cs" />
-    <Compile Include="Platform\Media\MediaLibrary.Android.cs" />
     <Compile Include="Platform\Media\MediaPlayer.Default.cs" />
-    <Compile Include="Platform\Media\Song.Android.cs" />
-    <Compile Include="Platform\Media\SuperVideoPlayer.Android.cs" />
-    <Compile Include="Platform\Media\SuperVideoPlayer.Android.Obsolete.cs" />
-    <Compile Include="Platform\Media\Video.Android.cs" />
-    <Compile Include="Platform\Media\VideoPlayer.Android.cs" />
     <Compile Include="Platform\PrimaryThreadLoader.cs" />
     <Compile Include="Platform\TitleContainer.Android.cs" />
     <Compile Include="Platform\Utilities\FuncLoader.Android.cs" />
@@ -93,5 +92,5 @@
 
   <Import Project="Platform\OpenGL.targets" />
   <Import Project="Platform\OpenAL.targets" />
-  <Import Project="Platform\Microsoft.Devices.Sensors.targets" />
+  <Import Project="MonoGame.Framework.Devices.Sensors.targets" />
 </Project>

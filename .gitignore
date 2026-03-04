@@ -44,6 +44,7 @@ project.lock.json
 /MonoGame.Framework/MonoGame.Framework.Net.WindowsUniversal.project.lock.json
 /MonoGame.Framework/MonoGame.Framework.WindowsUniversal.project.lock.json
 artifacts/
+Artifacts/
 
 # JetBrains Rider
 .idea/
@@ -88,5 +89,13 @@ IDE/MonoDevelop/MonoDevelop.MonoGame/templates/Common/MonoGame.Framework.dll.con
 # CAKE
 .cake/**
 
+# Xmake
+.xmake
+vsxmake2022
+
 # docfx
 _*
+
+# Street of Rage 4
+.bin.Android*
+.bin.iOS*

@@ -103,7 +103,7 @@ namespace Microsoft.Xna.Framework.Media
 
             return texture;
         }
-        
+
         private void PlatformGetState(ref MediaState result)
         {
             // Force stopped state when duration is full

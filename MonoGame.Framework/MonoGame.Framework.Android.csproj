@@ -17,6 +17,26 @@
 	<Configurations>Debug;Release;DebugPlaydi;ReleasePlaydi;ProfilePlaydi</Configurations>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|ARM64' ">
+    <AndroidSupportedAbis>arm64-v8a</AndroidSupportedAbis>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'DebugPlaydi|ARM64' ">
+    <AndroidSupportedAbis>arm64-v8a</AndroidSupportedAbis>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'ProfilePlaydi|ARM64' ">
+    <AndroidSupportedAbis>arm64-v8a</AndroidSupportedAbis>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|ARM64' ">
+    <AndroidSupportedAbis>arm64-v8a</AndroidSupportedAbis>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'ReleasePlaydi|ARM64' ">
+    <AndroidSupportedAbis>arm64-v8a</AndroidSupportedAbis>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Include="..\README-packages.md" Pack="true" PackagePath="\"/>
   </ItemGroup>

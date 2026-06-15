@@ -121,6 +121,10 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformUpdateQueue()
         {
+#if IOS
+            if (OpenALSoundController.IsInterrupted)
+                return;
+#endif
             // Get the completed buffers
             AL.GetError();
             int numBuffers;

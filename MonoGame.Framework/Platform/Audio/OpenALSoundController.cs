@@ -30,9 +30,15 @@ namespace Microsoft.Xna.Framework.Audio
             ALError error;
             if ((error = AL.GetError()) != ALError.NoError)
             {
+                if (OpenALSoundController.IsInterrupted)
+                    return;
+#if IOS
+                if (error == ALError.InvalidOperation)
+                    return;
+#endif
                 if (args != null && args.Length > 0)
                     message = String.Format(message, args);
-                
+
                 throw new InvalidOperationException(message + " (Reason: " + AL.GetErrorString(error) + ")");
             }
         }
@@ -72,6 +78,8 @@ namespace Microsoft.Xna.Framework.Audio
         private IntPtr _context;
         IntPtr NullContext = IntPtr.Zero;
         private int[] allSourcesArray;
+        private List<int> _interruptedSources = new List<int>();
+
 #if DESKTOPGL || ANGLE
 
         // MacOS & Linux shares a limit of 256.
@@ -96,6 +104,8 @@ namespace Microsoft.Xna.Framework.Audio
         private List<int> availableSourcesCollection;
         private List<int> inUseSourcesCollection;
         bool _isDisposed;
+        private volatile bool _interrupted;
+        internal static bool IsInterrupted => _instance != null && _instance._interrupted;
         public bool SupportsIma4 { get; private set; }
         public bool SupportsAdpcm { get; private set; }
         public bool SupportsEfx { get; private set; }
@@ -242,6 +252,16 @@ namespace Microsoft.Xna.Framework.Audio
                     switch (e.InterruptionType)
                     {
                         case AVAudioSessionInterruptionType.Began:
+                            _interrupted = true;
+                            _interruptedSources.Clear();
+                            foreach (var sourceId in inUseSourcesCollection)
+                            {
+                                if (AL.GetSourceState(sourceId) == ALSourceState.Playing)
+                                {
+                                    _interruptedSources.Add(sourceId);
+                                    AL.SourcePause(sourceId);
+                                }
+                            }
                             AVAudioSession.SharedInstance().SetActive(false);
                             Alc.MakeContextCurrent(IntPtr.Zero);
                             Alc.SuspendContext(_context);
@@ -250,6 +270,10 @@ namespace Microsoft.Xna.Framework.Audio
                             AVAudioSession.SharedInstance().SetActive(true);
                             Alc.MakeContextCurrent(_context);
                             Alc.ProcessContext(_context);
+                            foreach (var sourceId in _interruptedSources)
+                                AL.SourcePlay(sourceId);
+                            _interruptedSources.Clear();
+                            _interrupted = false;
                             break;
                     }
                 };
@@ -388,7 +412,7 @@ namespace Microsoft.Xna.Framework.Audio
                         Efx.DeleteFilter(Filter);
 
                     Microphone.StopMicrophones();
-                    CleanUpOpenAL();                    
+                    CleanUpOpenAL();
                 }
                 _isDisposed = true;
             }
@@ -405,7 +429,7 @@ namespace Microsoft.Xna.Framework.Audio
             int sourceNumber;
 
             lock (availableSourcesCollection)
-            {                
+            {
                 if (availableSourcesCollection.Count == 0)
                 {
                     throw new InstancePlayLimitException();

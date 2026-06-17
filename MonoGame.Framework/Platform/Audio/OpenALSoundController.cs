@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Runtime.InteropServices;
+using Foundation;
 using MonoGame.Framework.Utilities;
 using MonoGame.OpenAL;
 using MonoGame.OpenGL;
+using UIKit;
 
 #if ANDROID
 using System.Globalization;
@@ -253,33 +255,29 @@ namespace Microsoft.Xna.Framework.Audio
                     {
                         case AVAudioSessionInterruptionType.Began:
                             _interrupted = true;
-                            _interruptedSources.Clear();
-                            foreach (var sourceId in inUseSourcesCollection)
-                            {
-                                if (AL.GetSourceState(sourceId) == ALSourceState.Playing)
-                                {
-                                    _interruptedSources.Add(sourceId);
-                                    AL.SourcePause(sourceId);
-                                }
-                            }
+                            Console.WriteLine("[Audio] BEGAN - interrupted flag set");
                             AVAudioSession.SharedInstance().SetActive(false);
                             Alc.MakeContextCurrent(IntPtr.Zero);
-                            Alc.SuspendContext(_context);
                             break;
                         case AVAudioSessionInterruptionType.Ended:
                             AVAudioSession.SharedInstance().SetActive(true);
-                            Alc.MakeContextCurrent(_context);
-                            Alc.ProcessContext(_context);
-                            foreach (var sourceId in _interruptedSources)
-                                AL.SourcePlay(sourceId);
-                            _interruptedSources.Clear();
+                            RecreateContext();
                             _interrupted = false;
+                            NSNotificationCenter.DefaultCenter.PostNotificationName("MonoGameAudioSessionRestored", null);
                             break;
                     }
                 };
 
                 AVAudioSession.Notifications.ObserveInterruption(handler);
+                NSNotificationCenter.DefaultCenter.AddObserver(
+                    UIApplication.DidBecomeActiveNotification,
+                    _ => { if (_interrupted) TryRestoreAudio(); });
 
+                NSNotificationCenter.DefaultCenter.AddObserver(
+                    new NSString("AVAudioSessionAvailableInputsChangeNotification"),
+                    null,
+                    NSOperationQueue.MainQueue,
+                    _ => { if (_interrupted) TryRestoreAudio(); });
                 // Activate the instance or else the interruption handler will not be called.
                 AVAudioSession.SharedInstance().SetActive(true);
 
@@ -304,6 +302,55 @@ namespace Microsoft.Xna.Framework.Audio
                 }
             }
             return false;
+        }
+#if IOS
+        private int _restoreAttempts = 0;
+
+        private void TryRestoreAudio()
+        {
+            if (!_interrupted) return;
+            Console.WriteLine("[Audio] TryRestoreAudio called, attempt=" + _restoreAttempts);
+            NSError error;
+            bool activated = AVAudioSession.SharedInstance().SetActive(true, out error);
+            Console.WriteLine("[Audio] SetActive result=" + activated + " error=" + (error?.LocalizedDescription ?? "none"));
+            if (!activated)
+            {
+                if (++_restoreAttempts < 10)
+                {
+                    NSTimer.CreateScheduledTimer(0.5, t => { t.Invalidate(); TryRestoreAudio(); });
+                    return;
+                }
+                Console.WriteLine("[Audio] TryRestoreAudio GAVE UP after 10 attempts");
+                return;
+            }
+            Console.WriteLine("[Audio] SetActive succeeded, recreating context");
+            _restoreAttempts = 0;
+            RecreateContext();
+            _interrupted = false;
+            NSNotificationCenter.DefaultCenter.PostNotificationName("MonoGameAudioSessionRestored", null);
+        }
+#endif
+        private void RecreateContext()
+        {
+            Alc.MakeContextCurrent(NullContext);
+            if (_context != NullContext)
+            {
+                Alc.DestroyContext(_context);
+                _context = NullContext;
+            }
+            _context = Alc.CreateContext(_device, new int[0]);
+            Alc.MakeContextCurrent(_context);
+
+            // Regenerate all source IDs for the new context
+            AL.GenSources(allSourcesArray);
+            lock (availableSourcesCollection)
+            {
+                inUseSourcesCollection.Clear();
+                availableSourcesCollection.Clear();
+                availableSourcesCollection.AddRange(allSourcesArray);
+            }
+
+            DynamicSoundEffectInstanceManager.ReinitializeAllForNewContext();
         }
 
         public static void EnsureInitialized()

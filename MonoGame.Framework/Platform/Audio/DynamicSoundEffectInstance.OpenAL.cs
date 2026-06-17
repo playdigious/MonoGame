@@ -119,17 +119,23 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
+        internal void ReinitializeForNewContext()
+        {
+            // Old source/buffer IDs are invalid — get a fresh source from the new context's pool
+            _queuedBuffers = new Queue<OALSoundBuffer>();
+            HasSourceId = false;
+            _state = SoundState.Stopped;
+            SourceId = controller.ReserveSource();
+            HasSourceId = true;
+        }
+
         private void PlatformUpdateQueue()
         {
-#if IOS
-            if (OpenALSoundController.IsInterrupted)
-                return;
-#endif
             // Get the completed buffers
             AL.GetError();
             int numBuffers;
             AL.GetSource(SourceId, ALGetSourcei.BuffersProcessed, out numBuffers);
-            ALHelper.CheckError("Failed to get processed buffer count.");
+            Console.WriteLine("[Audio] PlatformUpdateQueue numBuffers=" + numBuffers + " state=" + AL.GetSourceState(SourceId));
 
             // Unqueue them
             if (numBuffers > 0)

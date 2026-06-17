@@ -36,6 +36,16 @@ namespace Microsoft.Xna.Framework.Audio
                 }
             }
         }
+        public static void ReinitializeAllForNewContext()
+        {
+            for (int i = _playingInstances.Count - 1; i >= 0; i--)
+            {
+                var target = _playingInstances[i].Target as DynamicSoundEffectInstance;
+                if (target != null && !target.IsDisposed)
+                    target.ReinitializeForNewContext();
+                _playingInstances.RemoveAt(i);
+            }
+        }
 
         /// <summary>
         /// Updates buffer queues of the currently playing instances.
@@ -45,6 +55,9 @@ namespace Microsoft.Xna.Framework.Audio
         /// </remarks>
         public static void UpdatePlayingInstances()
         {
+#if IOS
+            if (OpenALSoundController.IsInterrupted) return;
+#endif
             for (int i = _playingInstances.Count - 1; i >= 0; i--)
             {
                 var target = _playingInstances[i].Target as DynamicSoundEffectInstance;

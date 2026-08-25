@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Runtime.InteropServices;
-using Foundation;
 using MonoGame.Framework.Utilities;
 using MonoGame.OpenAL;
 using MonoGame.OpenGL;
-using UIKit;
 
 #if ANDROID
 using System.Globalization;
@@ -17,6 +15,8 @@ using Android.Media;
 #endif
 
 #if IOS
+using Foundation;
+using UIKit;
 using AudioToolbox;
 using AVFoundation;
 #endif

@@ -135,7 +135,6 @@ namespace Microsoft.Xna.Framework.Audio
             AL.GetError();
             int numBuffers;
             AL.GetSource(SourceId, ALGetSourcei.BuffersProcessed, out numBuffers);
-            Console.WriteLine("[Audio] PlatformUpdateQueue numBuffers=" + numBuffers + " state=" + AL.GetSourceState(SourceId));
 
             // Unqueue them
             if (numBuffers > 0)

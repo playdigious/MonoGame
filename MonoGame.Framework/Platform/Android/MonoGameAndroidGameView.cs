@@ -1155,7 +1155,7 @@ namespace Microsoft.Xna.Framework
             if (device == null)
                 return false;
             var sources = device.Sources;
-            return (sources & InputSourceType.Keyboard) == InputSourceType.Keyboard && device.VendorId != 0 && device.ProductId != 0;
+            return (sources & InputSourceType.Keyboard) == InputSourceType.Keyboard && !device.IsVirtual && device.KeyboardType == InputKeyboardType.Alphabetic;
         }
 
         private bool IsGamePad(InputDevice device) {

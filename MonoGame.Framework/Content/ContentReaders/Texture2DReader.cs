@@ -4,6 +4,11 @@
 
 using System;
 using Microsoft.Xna.Framework.Graphics;
+#if IOS
+using CoreGraphics;
+using Foundation;
+using ImageIO;
+#endif
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -60,6 +65,21 @@ namespace Microsoft.Xna.Framework.Content
 				case SurfaceFormat.NormalizedByte4:
 					convertedFormat = SurfaceFormat.Color;
 					break;
+#if IOS
+				case SurfaceFormat.Astc4X4Rgba:
+				case SurfaceFormat.Rgba4x4Astc:
+				case SurfaceFormat.Rgba5x5Astc:
+				case SurfaceFormat.Rgba6x6Astc:
+					if (!reader.GetGraphicsDevice().GraphicsCapabilities.SupportsAstc)
+						convertedFormat = SurfaceFormat.Color;
+					break;
+				case SurfaceFormat.SRgba4x4Astc:
+				case SurfaceFormat.SRgba5x5Astc:
+				case SurfaceFormat.SRgba6x6Astc:
+					if (!reader.GetGraphicsDevice().GraphicsCapabilities.SupportsAstc)
+						convertedFormat = SurfaceFormat.ColorSRgb;
+					break;
+#endif
 			}
 			
             texture = existingInstance ?? new Texture2D(reader.GetGraphicsDevice(), width, height, levelCountOutput > 1, convertedFormat);
@@ -110,6 +130,21 @@ namespace Microsoft.Xna.Framework.Content
                                     levelDataSizeInBytes = levelData.Length;
                                 }
 				            break;
+#if IOS
+                        case SurfaceFormat.Astc4X4Rgba:
+                        case SurfaceFormat.Rgba4x4Astc:
+                        case SurfaceFormat.Rgba5x5Astc:
+                        case SurfaceFormat.Rgba6x6Astc:
+                        case SurfaceFormat.SRgba4x4Astc:
+                        case SurfaceFormat.SRgba5x5Astc:
+                        case SurfaceFormat.SRgba6x6Astc:
+                            if (convertedFormat != surfaceFormat)
+                            {
+                                levelData = DecompressAstc(levelData, levelDataSizeInBytes, levelWidth, levelHeight, surfaceFormat);
+                                levelDataSizeInBytes = levelData.Length;
+                            }
+                            break;
+#endif
                         case SurfaceFormat.Bgra5551:
                             {
 #if OPENGL
@@ -176,5 +211,74 @@ namespace Microsoft.Xna.Framework.Content
         			
 			return texture;
 		}
+
+#if IOS
+        private static byte[] DecompressAstc(byte[] data, int size, int width, int height, SurfaceFormat format)
+        {
+            int block;
+            switch (format)
+            {
+                case SurfaceFormat.Rgba5x5Astc:
+                case SurfaceFormat.SRgba5x5Astc:
+                    block = 5;
+                    break;
+                case SurfaceFormat.Rgba6x6Astc:
+                case SurfaceFormat.SRgba6x6Astc:
+                    block = 6;
+                    break;
+                default:
+                    block = 4;
+                    break;
+            }
+
+            byte[] file = new byte[16 + size];
+            file[0] = 0x13;
+            file[1] = 0xAB;
+            file[2] = 0xA1;
+            file[3] = 0x5C;
+            file[4] = (byte)block;
+            file[5] = (byte)block;
+            file[6] = 1;
+            file[7] = (byte)width;
+            file[8] = (byte)(width >> 8);
+            file[9] = (byte)(width >> 16);
+            file[10] = (byte)height;
+            file[11] = (byte)(height >> 8);
+            file[12] = (byte)(height >> 16);
+            file[13] = 1;
+            Buffer.BlockCopy(data, 0, file, 16, size);
+
+            byte[] pixels = new byte[width * height * 4];
+            using (NSData fileData = NSData.FromArray(file))
+            using (CGImageSource source = CGImageSource.FromData(fileData))
+            using (CGImage image = source?.CreateImage(0, (CGImageOptions)null))
+            {
+                if (image == null)
+                    return pixels;
+
+                bool rgbaLast = image.BitsPerComponent == 8 && image.BitsPerPixel == 32
+                    && (image.AlphaInfo == CGImageAlphaInfo.Last || image.AlphaInfo == CGImageAlphaInfo.PremultipliedLast)
+                    && (image.BitmapInfo & CGBitmapFlags.ByteOrderMask) == CGBitmapFlags.ByteOrderDefault;
+                if (rgbaLast)
+                {
+                    using (NSData decoded = image.DataProvider.CopyData())
+                    {
+                        int rowBytes = (int)image.BytesPerRow;
+                        for (int y = 0; y < height; y++)
+                            global::System.Runtime.InteropServices.Marshal.Copy(decoded.Bytes + y * rowBytes, pixels, y * width * 4, width * 4);
+                    }
+                }
+                else
+                {
+                    using (CGColorSpace colorSpace = CGColorSpace.CreateDeviceRGB())
+                    using (CGBitmapContext context = new CGBitmapContext(pixels, width, height, 8, width * 4, colorSpace, CGImageAlphaInfo.PremultipliedLast))
+                    {
+                        context.DrawImage(new CGRect(0, 0, width, height), image);
+                    }
+                }
+            }
+            return pixels;
+        }
+#endif
     }
 }

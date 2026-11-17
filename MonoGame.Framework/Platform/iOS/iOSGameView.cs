@@ -104,7 +104,9 @@ namespace Microsoft.Xna.Framework {
 					EAGLDrawableProperty.ColorFormat
 				});
 
-			Layer.ContentsScale = Window.Screen.Scale;
+			nfloat scale = ObjCRuntime.Runtime.Arch == ObjCRuntime.Arch.SIMULATOR ? 1 : Window.Screen.Scale;
+			ContentScaleFactor = scale;
+			Layer.ContentsScale = scale;
 
 			//var strVersion = OpenTK.Graphics.ES11.GL.GetString (OpenTK.Graphics.ES11.All.Version);
 			//strVersion = OpenTK.Graphics.ES20.GL.GetString (OpenTK.Graphics.ES20.All.Version);

@@ -70,7 +70,7 @@ namespace Microsoft.Xna.Framework {
 		[Export ("layerClass")]
 		public static Class GetLayerClass ()
 		{
-			return new Class (typeof (CAEAGLLayer));
+			return Angle.IsAvailable ? new Class (typeof (CAMetalLayer)) : new Class (typeof (CAEAGLLayer));
 		}
 
 		public override bool CanBecomeFirstResponder {
@@ -81,6 +81,8 @@ namespace Microsoft.Xna.Framework {
 			get { return base.Layer as CAEAGLLayer; }
 		}
 
+		private bool _framebufferCreated;
+
 		// FIXME: Someday, hopefully it will be possible to move
 		//        GraphicsContext into an iOS-specific GraphicsDevice.
 		//        Some level of cooperation with the UIView/Layer will
@@ -90,6 +92,17 @@ namespace Microsoft.Xna.Framework {
 		private void CreateContext ()
 		{
 			AssertNotDisposed ();
+
+			if (Angle.IsAvailable) {
+				ContentScaleFactor = Window.Screen.Scale;
+				base.Layer.ContentsScale = Window.Screen.Scale;
+				var gdm = _platform.Game.Services.GetService(typeof(IGraphicsDeviceManager)) as GraphicsDeviceManager;
+				bool depthStencil = gdm != null && gdm.PreferredDepthStencilFormat != DepthFormat.None;
+				__renderbuffergraphicsContext = new AngleGraphicsContext (base.Layer.Handle, depthStencil);
+				this.MakeCurrent();
+				_glapi = new Gles20Api();
+				return;
+			}
 
             // RetainedBacking controls if the content of the colorbuffer should be preserved after being displayed
             // This is the XNA equivalent to set PreserveContent when initializing the GraphicsDevice
@@ -104,9 +117,7 @@ namespace Microsoft.Xna.Framework {
 					EAGLDrawableProperty.ColorFormat
 				});
 
-			nfloat scale = ObjCRuntime.Runtime.Arch == ObjCRuntime.Arch.SIMULATOR ? 1 : Window.Screen.Scale;
-			ContentScaleFactor = scale;
-			Layer.ContentsScale = scale;
+			Layer.ContentsScale = Window.Screen.Scale;
 
 			//var strVersion = OpenTK.Graphics.ES11.GL.GetString (OpenTK.Graphics.ES11.All.Version);
 			//strVersion = OpenTK.Graphics.ES20.GL.GetString (OpenTK.Graphics.ES20.All.Version);
@@ -148,9 +159,14 @@ namespace Microsoft.Xna.Framework {
 			//        here and then force the state into
 			//        GraphicsDevice.  However, that change is a
 			//        ways off, yet.
-            int viewportHeight = (int)Math.Round(Layer.Bounds.Size.Height * Layer.ContentsScale);
-            int viewportWidth = (int)Math.Round(Layer.Bounds.Size.Width * Layer.ContentsScale);
+            int viewportHeight = (int)Math.Round(base.Layer.Bounds.Size.Height * base.Layer.ContentsScale);
+            int viewportWidth = (int)Math.Round(base.Layer.Bounds.Size.Width * base.Layer.ContentsScale);
+			_framebufferCreated = true;
 
+			if (Angle.IsAvailable) {
+				_framebuffer = 0;
+				_glapi.BindFramebuffer (FramebufferTarget.Framebuffer, 0);
+			} else {
 			_glapi.GenFramebuffers (1, ref _framebuffer);
             _glapi.BindFramebuffer (FramebufferTarget.Framebuffer, _framebuffer);
 
@@ -193,6 +209,7 @@ namespace Microsoft.Xna.Framework {
 			if (status != FramebufferErrorCode.FramebufferComplete)
 				throw new InvalidOperationException (
 					"Framebuffer was not created correctly: " + status);
+			}
 
 			_glapi.Viewport(0, 0, viewportWidth, viewportHeight);
             _glapi.Scissor(0, 0, viewportWidth, viewportHeight);
@@ -244,6 +261,10 @@ namespace Microsoft.Xna.Framework {
 			AssertValidContext ();
 
 			__renderbuffergraphicsContext.MakeCurrent (null);
+			_framebufferCreated = false;
+
+			if (Angle.IsAvailable)
+				return;
 
 			_glapi.DeleteFramebuffers (1, ref _framebuffer);
 			_framebuffer = 0;
@@ -271,8 +292,11 @@ namespace Microsoft.Xna.Framework {
             AssertValidContext ();
 
             this.MakeCurrent();
-            GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, this._colorbuffer);
-            GL.InvalidateFramebuffer(FramebufferTarget.Framebuffer, 2, attachements);
+            if (!Angle.IsAvailable)
+            {
+                GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, this._colorbuffer);
+                GL.InvalidateFramebuffer(FramebufferTarget.Framebuffer, 2, attachements);
+            }
             __renderbuffergraphicsContext.SwapBuffers();
 		}
 
@@ -298,7 +322,7 @@ namespace Microsoft.Xna.Framework {
             if (gds == null || gds.GraphicsDevice == null)
                 return;
 
-			if (_framebuffer != 0)
+			if (_framebufferCreated)
 				DestroyFramebuffer ();
 			if (__renderbuffergraphicsContext == null)
 				CreateContext();
@@ -315,7 +339,7 @@ namespace Microsoft.Xna.Framework {
                 
                 if (__renderbuffergraphicsContext == null)
                     CreateContext ();
-                if (_framebuffer == 0)
+                if (!_framebufferCreated)
                     CreateFramebuffer ();
             }
 		}

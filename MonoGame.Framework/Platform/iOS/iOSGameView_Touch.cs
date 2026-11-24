@@ -125,7 +125,7 @@ namespace Microsoft.Xna.Framework
         public Vector2 GetOffsetPosition(Vector2 position, bool useScale)
         {
             if (useScale)
-                return position * (float)Layer.ContentsScale;
+                return position * (float)base.Layer.ContentsScale;
             return position;
         }
 

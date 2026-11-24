@@ -13,7 +13,7 @@ namespace MonoGame.OpenGL
 {
     internal partial class GL
 	{
-        public static IntPtr Library = FuncLoader.LoadLibrary("/System/Library/Frameworks/OpenGLES.framework/OpenGLES");
+        public static IntPtr Library = Angle.IsAvailable ? Angle.GlesLibrary : FuncLoader.LoadLibrary("/System/Library/Frameworks/OpenGLES.framework/OpenGLES");
         
         static partial void LoadPlatformEntryPoints()
 		{
